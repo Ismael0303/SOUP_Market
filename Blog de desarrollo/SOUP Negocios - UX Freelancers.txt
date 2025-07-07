@@ -1,0 +1,871 @@
+*SOUP Emprendimientos*
+
+Servicio de hosting de Tiendas Virtuales en la nube para freelancers y micro-emprendedores
+Marketplace Publico (agregador de tiendas virtuales)
+
+=======================================================================================
+
+Marketplace Público
+	Listado de Freelancers/Servicios
+	Listado de Tiendas/Productos
+	Publicidades premium
+
+=======================================================================================
+
+Tier 0 - Clientes
+Estructura de UX:
+
+. Ingreso al perfil personal
+	Nombre
+	Localización
+	Información de contacto
+
+. Ver Marketplace:
+	Listado de Freelancers/Servicios
+	Listado de Tiendas/Productos
+	Filtros (x ubicación/rubro/precio)
+	Buscar por palabras clave
+
+. Lista de Favoritos
+
+. Servicios solicitados:
+	Encargos solicitados
+	Progreso del servicio
+	Mensajes
+
+. Historial de servicios:
+		Encargos completados
+		Reviews
+
+. Compras en curso:
+	Encargos solicitados
+	Envios en proceso
+	Mensajes
+
+. Historial de compras:
+		Encargos completados
+		Reviews
+	
+=======================================================================================
+
+Tier 1 - Freelancers
+Estructura de UX:
+
+. Ingreso al perfil personal
+	Nombre
+	Localización
+	Información de contacto
+
+. Curriculum Vitae
+	Educación
+	Experiencia laboral
+	Conocimientos y habilidades
+
+. Lista de Servicios ofrecidos
+. Nuevo Servicio:
+	Nombre
+	Rubro
+	Descripción
+	Precio por hora
+	Insumos (a medida según trabajo)
+	Precio: precioxHora * tiempoTotal + Insumos 
+	Fotos
+
+. Encargos:
+	Encargos solicitados
+	Encargos en curso:
+		Mensajes
+		Progreso
+	Encargos completados
+		Reviews
+
+. Clientes:
+	Contacto (telefono, whatsapp, instagram, email)
+	Nuevo Mensaje (compartir/copiar al portapapeles)
+	Historial de mensajes
+	Registro de ventas
+
+. Proveedores:
+	Contactos (telefono, whatsapp, instagram, email)
+	Nuevo Mensaje (compartir/copiar al portapapeles)
+	Historial de mensajes
+	Registro de compras
+
+. Informes:
+	Horas de trabajo total (x dia, semana, mes, año)
+	Ganancias Netas (x dia, semana, mes, año): horasTrabajo * precioxHora
+
+. Publicidad (premium):
+	Nueva publicidad (en el marketplace)
+	Historial de publicidades
+	Rendimientos (visualizaciones/ventas concretadas)
+
+=======================================================================================
+
+Tier 2 - Microemprendimientos
+Estructura de UX:
+
+. Ingreso al perfil personal
+	Nombre
+	Localización
+	Información de contacto
+
+. Lista de Negocios
+. Nuevo Negocio:
+	Nombre
+	Rubro
+	Descripción
+	Localización
+	Productos
+	Rating/Reviews
+	Fotos
+	Reviews
+
+Para cada Negocio:
+
+. Lista de Productos
+. Nuevo Producto:
+	Nombre
+	Descripción
+	Insumos:
+		Material/Servicio
+		Descripción
+		Proveedor
+		Costo Unitario (por unidad de medida/unidad de tiempo)
+		Cantidad
+		Costo Neto: costoUnitario * cantidad
+	COGS: sumatoria(costoNeto.insumos)
+	Margen de ganancias: X %
+	Precio sugerido: COGS + (COGS * Margen)
+	Fotos
+	Stock
+	Reviews
+
+. Encargos:
+	Encargos solicitados
+	Encargos en curso:
+		Mensajes
+		Proveedor de encomienda
+		Costo del envío
+		Progreso del envío
+	Encargos completados:
+		Resumen
+		Reviews
+
+. Clientes:
+	Contacto (telefono, whatsapp, instagram, email)
+	Nuevo Mensaje (compartir/copiar al portapapeles)
+	Historial de mensajes
+	Registro de ventas
+
+. Proveedores:
+	Contactos (telefono, whatsapp, instagram, email)
+	Nuevo Mensaje (compartir/copiar al portapapeles)
+	Historial de mensajes
+	Registro de compras
+
+. Encomiendas
+	Envios en curso
+	Envios completados
+
+. Informes:
+	Productos vendidos (x dia, semana, mes, año)
+	Ganancias Netas (x dia, semana, mes, año): productosVendidos * (Precio - COGS)
+	Total insumos utilizados
+
+. Publicidad (premium):
+	Nueva publicidad (en el marketplace)
+	Historial de publicidades
+	Rendimientos (visualizaciones/ventas concretadas)
+
+=======================================================================================
+=======================================================================================
+
+/SOUP_Emprendimientos
+├── /backend
+│   ├── /app
+│   │   ├── main.py                   # Configuración de FastAPI, routers principales
+│   │   ├── database.py                 # Conexión a DB, sesión de SQLAlchemy
+│   │   ├── models.py                   # Definiciones de Modelos de Datos (SQLAlchemy)
+│   │   ├── schemas.py                  # Pydantic Schemas para Request/Response (validación de datos)
+│   │   ├── dependencies.py             # Dependencias inyectables (ej. get_db, get_current_user)
+│   │   ├── auth.py                     # Lógica de autenticación (JWT, hashing de contraseñas)
+│   │   ├── /crud                     # Operaciones CRUD básicas de base de datos
+│   │   │   ├── user.py
+│   │   │   ├── negocio.py
+│   │   │   ├── producto.py
+│   │   │   ├── insumo.py
+│   │   │   ├── contacto.py
+│   │   │   ├── mensaje_registro.py
+│   │   │   ├── encargo.py
+│   │   │   ├── review.py
+│   │   │   ├── publicidad.py
+│   │   ├── /services                 # Lógica de negocio más compleja, cálculos
+│   │   │   ├── pricing_service.py      # Lógica de la calculadora de precios (COGS, margen)
+│   │   │   ├── report_service.py       # Lógica de generación de informes
+│   │   │   ├── ia_service.py           # Interfaz con el modelo de IA (gemini-2.0-flash)
+│   │   │   ├── communication_service.py # Lógica para generar links externos de mensajería
+│   │   ├── /routers                  # Endpoints de API (organizados por módulo)
+│   │   │   ├── auth_router.py
+│   │   │   ├── user_router.py
+│   │   │   ├── negocio_router.py
+│   │   │   ├── producto_router.py
+│   │   │   ├── contacto_router.py
+│   │   │   ├── mensaje_router.py
+│   │   │   ├── encargo_router.py
+│   │   │   ├── informe_router.py
+│   │   │   ├── marketplace_router.py
+│   │   │   ├── review_router.py
+│   │   │   ├── advertising_router.py
+│   │   │   ├── ia_router.py            # Endpoints para interacciones directas con IA
+│   │   ├── /core                     # Configuraciones globales, settings
+│   │   │   ├── config.py
+│   │   │   ├── security.py
+│   │   ├── /utils                    # Funciones de utilidad (ej. generadores UUID)
+│   │   │   ├── geospatial_utils.py     # Para PostGIS
+│   ├── .env.example
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── README.md
+├── /frontend
+│   ├── /public
+│   │   └── index.html
+│   ├── /src
+│   │   ├── App.js                      # Router principal, gestión de estado global
+│   │   ├── index.js                    # Punto de entrada de React
+│   │   ├── /api                      # Funciones para interactuar con el Backend API
+│   │   │   ├── authApi.js
+│   │   │   ├── usersApi.js
+│   │   │   ├── productsApi.js
+│   │   │   ├── marketplaceApi.js
+│   │   │   # ... y más archivos por cada dominio de la API
+│   │   ├── /components               # Componentes UI reutilizables pequeños
+│   │   │   ├── Auth                  # Login, Register
+│   │   │   ├── Common                # Botones, Inputs, Modales
+│   │   │   ├── Forms                 # Formularios específicos
+│   │   │   ├── Layout                # Navbar, Sidebar, Footer
+│   │   │   ├── ProductCards.js       # Tarjeta de producto para Marketplace
+│   │   │   ├── BusinessProfile.js    # Perfil del negocio para Marketplace
+│   │   │   # ... etc.
+│   │   ├── /screens                  # Componentes de "pantalla" o "página" (vistas principales)
+│   │   │   ├── AuthScreens           # LoginScreen, RegisterScreen
+│   │   │   ├── DashboardScreen.js
+│   │   │   ├── ProfileScreen.js
+│   │   │   ├── BusinessManagementScreen.js
+│   │   │   ├── ProductServiceManagementScreen.js
+│   │   │   ├── EncargosManagementScreen.js
+│   │   │   ├── ClientsSuppliersScreen.js
+│   │   │   ├── ReportsScreen.js
+│   │   │   ├── MarketplacePublicScreen.js
+│   │   │   ├── PublicProfileScreen.js
+│   │   │   ├── PublicProductDetailScreen.js
+│   │   ├── /hooks                    # Custom React Hooks (ej. useAuth, useForm)
+│   │   ├── /context                  # React Context para estado global (ej. AuthContext)
+│   │   ├── /utils                    # Funciones de utilidad (formato de fechas, validaciones)
+│   │   ├── /assets                   # Imágenes, iconos, etc.
+│   │   ├── index.css                 # Tailwind CSS base y custom styles
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   └── README.md
+├── .gitignore
+├── README.md
+
+
+
+=======================================================================================
+=======================================================================================
+
+1. Modelos de Datos Detallados (Backend)
+
+Usuario (Perfil Personal del Emprendedor):
+
+id (UUID)
+nombre (String)
+email (String, único)
+password_hash (String)
+localizacion (String, o Lat/Lon para GIS futuro)
+info_contacto (JSONB para teléfono, whatsapp, instagram, email – aquí almacenarías los datos de contacto del emprendedor para su propio perfil)
+tipo_tier (String: 'freelancer', 'microemprendimiento', 'cliente') - Para decidir qué UI mostrar.
+
+Negocio (para Tier 2 - Microemprendimientos):
+
+id (UUID)
+usuario_id (ForeignKey a Usuario.id)
+nombre (String)
+rubro (String)
+descripcion (String)
+localizacion_geografica (PostGIS Point, opcional para PMV, String para inicio)
+fotos_urls (JSONB: Array de URLs de imágenes)
+rating_promedio (Float, calculado)
+reviews_totales (Integer, calculado)
+fecha_creacion (Timestamp)
+
+Servicio (para Tier 1 - Freelancers - Generalización de 'Producto'):
+
+id (UUID)
+usuario_id (ForeignKey a Usuario.id)
+nombre (String)
+rubro (String)
+descripcion (String)
+precio_por_hora (Float)
+fotos_urls (JSONB: Array de URLs)
+tipo_servicio (String: 'arquitectura', 'musica', 'diseño_grafico', 'tutoria', 'plomeria', etc.)
+
+Producto (Generalizado para ambos Tiers - Puede ser un servicio o un bien):
+
+id (UUID)
+negocio_id (ForeignKey a Negocio.id, si es Tier 2)
+servicio_id (ForeignKey a Servicio.id, si es Tier 1 - o fusionar con Servicio)
+nombre (String)
+descripcion (String)
+fotos_urls (JSONB: Array de URLs)
+stock (Integer, opcional, solo para bienes físicos)
+precio_sugerido (Float, calculado por la lógica de negocio)
+cogs (Float, calculado)
+margen_ganancia_porcentaje (Float)
+tipo_producto (String: 'bien_fisico', 'servicio_por_tiempo', 'servicio_por_proyecto', 'bien_digital_descargable')
+reviews_count (Integer, calculado)
+rating_promedio (Float, calculado)
+unidad_medida (String: 'unidad', 'kg', 'litro', 'hora', 'proyecto')
+
+Insumo (Detalle de Componentes de un Producto/Servicio):
+
+id (UUID)
+producto_id (ForeignKey a Producto.id)
+material_servicio (String: ej., 'naranjas', 'horas de diseño', 'gasolina', 'arcilla')
+descripcion (String, opcional)
+proveedor (String, opcional, nombre del proveedor)
+costo_unitario (Float)
+cantidad (Float)
+unidad_medida (String: 'kg', 'litro', 'hora', 'unidad')
+costo_neto (Float, calculado)
+
+Contacto (para Clientes/Proveedores del Emprendedor):
+
+id (UUID)
+usuario_id (ForeignKey a Usuario.id)
+nombre (String)
+tipo_contacto (String: 'cliente', 'proveedor')
+telefono (String)
+whatsapp (String, URL de wa.me, o solo número)
+instagram (String, URL de perfil)
+email (String)
+notas (String, notas personales del emprendedor sobre el contacto)
+
+MensajeRegistro (para Historial de Mensajes):
+
+id (UUID)
+contacto_id (ForeignKey a Contacto.id)
+usuario_id (ForeignKey a Usuario.id)
+fecha_envio (Timestamp)
+canal (String: 'whatsapp', 'email', 'instagram', 'llamada')
+contenido (String: el texto que se escribió en SOUP)
+proposito (String, manual: 'presupuesto', 'seguimiento', 'consulta', 'confirmacion')
+url_externa (String, el link a wa.me o mailto: que se generó)
+
+Encargo (Generalización de Pedidos/Proyectos):
+
+id (UUID)
+usuario_id (ForeignKey a Usuario.id, el emprendedor que recibe el encargo)
+cliente_id (ForeignKey a Contacto.id)
+producto_id (ForeignKey a Producto.id, el ítem encargado)
+fecha_solicitud (Timestamp)
+estado (String: 'solicitado', 'en_curso', 'completado', 'cancelado')
+descripcion_personalizada (String, si el encargo tiene especificaciones únicas)
+precio_final (Float)
+ganancia_neta_encargo (Float)
+reviews_id (ForeignKey a Review.id, si existe)
+
+Para servicios/productos digitales:
+
+progreso_porcentaje (Integer)
+mensajes_relacionados (JSONB: Array de IDs de MensajeRegistro)
+link_entrega_digital (String, URL a Wetransfer/Drive, si es producto digital)
+Para productos físicos/envío:
+proveedor_encomienda (String, ej., 'Correo Argentino', 'OCA')
+costo_envio (Float)
+progreso_envio (String: 'despachado', 'en_transito', 'entregado')
+tracking_number (String)
+
+Review (Opiniones de Clientes):
+
+id (UUID)
+cliente_id (ForeignKey a Usuario.id o Contacto.id del cliente que dejó la review)
+emprendimiento_id (ForeignKey a Negocio.id)
+producto_id (ForeignKey a Producto.id, opcional)
+rating (Integer: 1-5 estrellas)
+comentario (String)
+fecha_review (Timestamp)
+
+Publicidad (Premium):
+
+id (UUID)
+usuario_id (ForeignKey a Usuario.id)
+negocio_id (ForeignKey a Negocio.id, o Servicio.id si aplica a Freelancer)
+tipo_publicidad (String: 'destacado_marketplace', 'banner', etc.)
+estado (String: 'activo', 'finalizado', 'pendiente')
+fecha_inicio, fecha_fin (Timestamp)
+rendimientos_visualizaciones (Integer)
+rendimientos_clics (Integer)
+rendimientos_ventas_concretadas (Integer)
+
+=======================================================================================
+
+2. Endpoints de API Esenciales (Backend)
+
+Autenticación/Autorización:
+
+POST /users/register
+POST /users/login
+GET /users/me (perfil del usuario logueado)
+
+Gestión de Negocios/Servicios:
+
+POST /negocios/ (Crear un nuevo negocio/servicio)
+GET /negocios/{id} / GET /negocios/me (Leer)
+PUT /negocios/{id} (Actualizar)
+DELETE /negocios/{id} (Borrar)
+GET /negocios/me/productos / GET /negocios/{id}/productos
+
+Gestión de Productos/Servicios (Ofertas):
+
+POST /productos/ (Crear un nuevo producto/servicio)
+GET /productos/{id} / GET /productos (todos los productos del usuario/negocio)
+PUT /productos/{id}
+DELETE /productos/{id}
+POST /productos/calculate_price (Endpoint para la calculadora de precios, recibe insumos y margen, devuelve precio_sugerido, cogs, tiempo_requerido).
+
+Gestión de Contactos:
+
+POST /contactos/
+GET /contactos/me/clientes / GET /contactos/me/proveedores
+PUT /contactos/{id}
+DELETE /contactos/{id}
+
+Gestión de Mensajes (Registro):
+
+POST /mensajes/ (Crear un registro de mensaje enviado)
+GET /mensajes/contacto/{contacto_id} (Historial de mensajes de un contacto)
+
+Gestión de Encargos:
+
+POST /encargos/ (Crear un nuevo encargo - desde el cliente o el emprendedor)
+GET /encargos/me (Listar encargos del usuario)
+GET /encargos/{id}
+PUT /encargos/{id}/status (Actualizar estado)
+PUT /encargos/{id}/progress (Actualizar progreso)
+
+Informes:
+
+GET /reports/sales_summary (Resumen de ventas por período)
+GET /reports/profit_loss (Ganancias netas por período)
+GET /reports/insumos_usage (Uso de insumos)
+
+Marketplace (Público):
+
+GET /marketplace/search (Búsqueda global de negocios/productos con filtros de texto, rubro, ubicación, tier)
+GET /marketplace/negocios/{id} (Perfil público de un negocio)
+GET /marketplace/productos/{id} (Detalle público de un producto)
+GET /marketplace/featured (Publicidades premium)
+POST /ia/suggest_pricing (Recibe cogs, rubro, margen_deseado, devuelve sugerencia de ajuste)
+GET /ia/business_coach_insights (Devuelve insights sobre el negocio del usuario)
+
+=======================================================================================
+
+3. Wireframes / Flujos de Usuario (Frontend)
+Pantallas Clave (o un boceto): Cómo se ven las pantallas de:
+
+Login/Registro.
+Dashboard del Emprendedor (resumen de informes).
+Crear Nuevo Producto/Servicio (el formulario de Insumos y cálculos).
+Lista de Productos/Servicios (la tabla/tarjetas).
+Perfil de Cliente/Proveedor (con botones de contacto).
+La interfaz de búsqueda del Marketplace y los resultados.
+La página de detalle de un Producto/Servicio para el cliente.
+Interacciones Específicas: Qué pasa al hacer clic en un botón, cómo se validan los formularios, cómo se muestra un spinner de carga.
+
+=======================================================================================
+
+4. Datos de Ejemplo (Mock Data)
+
+Un par de usuarios con diferentes Tiers.
+Un "Negocio" de jugos, con 3-4 "Productos" (ej., Botella 1L Naranja) y sus Insumos.
+Un "Servicio" de diseño gráfico, con 2-3 "Servicios" (ej., Logo Básico) y sus Insumos de tiempo.
+Algunos Contactos y MensajeRegistro para ver el historial.
+Un par de Encargos en diferentes estados.
+	
+=======================================================================================
+=======================================================================================
+
+Pseudocódigo de Alto Nivel para SOUP Emprendimientos
+
+ENTIDAD Usuario:
+    id: UUID (PK)
+    nombre: String
+    email: String (Único)
+    password_hash: String
+    localizacion: String // Opcional: Lat/Lon con PostGIS para ubicación precisa
+    info_contacto: JSONB // Datos de contacto del usuario
+    tipo_tier: Enum('cliente', 'freelancer', 'microemprendimiento')
+    curriculum_vitae: JSONB // Solo para Freelancer (Educacion, Experiencia, Habilidades)
+
+ENTIDAD Negocio: // Para Tier 2 - Microemprendimientos
+    id: UUID (PK)
+    usuario_id: UUID (FK a Usuario.id)
+    nombre: String
+    rubro: String
+    descripcion: String
+    localizacion_geografica: PostGIS Point // Para búsquedas por ubicación
+    fotos_urls: JSONB // Array de URLs de fotos
+    rating_promedio: Float
+    reviews_totales: Integer
+    fecha_creacion: Timestamp
+
+ENTIDAD Producto: // Abstracción universal para servicios y bienes
+    id: UUID (PK)
+    usuario_id: UUID (FK a Usuario.id del creador)
+    negocio_id: UUID (FK a Negocio.id, si aplica - para Tier 2)
+    nombre: String
+    descripcion: String
+    tipo_producto: Enum('servicio_por_hora', 'servicio_por_proyecto', 'bien_fisico', 'bien_digital')
+    fotos_urls: JSONB // Array de URLs
+    atributos_especificos: JSONB // Almacena campos dinámicos específicos del tipo de producto (ej., 'sabor', 'talle', 'formato_archivo')
+    precio_sugerido: Float // Calculado
+    cogs: Float // Calculado
+    margen_ganancia_porcentaje: Float
+    stock: Integer // Solo para bienes físicos, opcional
+    unidad_medida: String // 'unidad', 'kg', 'litro', 'hora', 'proyecto'
+    reviews_count: Integer
+    rating_promedio: Float
+
+ENTIDAD Insumo: // Componentes de un Producto/Servicio
+    id: UUID (PK)
+    producto_id: UUID (FK a Producto.id)
+    nombre_insumo: String // Ej., 'naranjas', 'horas de diseño', 'gasolina', 'arcilla', 'licencia_software'
+    descripcion: String (Opcional)
+    proveedor: String (Opcional, nombre del proveedor)
+    costo_unitario: Float
+    cantidad: Float
+    unidad_medida: String // 'kg', 'litro', 'hora', 'unidad'
+    costo_neto: Float // Calculado: costo_unitario * cantidad
+
+ENTIDAD Contacto: // Clientes o Proveedores del Emprendedor
+    id: UUID (PK)
+    usuario_id: UUID (FK a Usuario.id del emprendedor que tiene este contacto)
+    nombre: String
+    tipo_contacto: Enum('cliente', 'proveedor')
+    telefono: String
+    whatsapp_url: String // wa.me/
+    instagram_url: String
+    email: String
+    notas_personales: String
+
+ENTIDAD MensajeRegistro: // Historial de comunicación enviada
+    id: UUID (PK)
+    contacto_id: UUID (FK a Contacto.id)
+    usuario_id: UUID (FK a Usuario.id del emprendedor que envió)
+    fecha_envio: Timestamp
+    canal: Enum('whatsapp', 'email', 'instagram_dm', 'llamada_registrada', 'copiado_portapapeles')
+    contenido: String // Texto completo del mensaje escrito en SOUP
+    proposito: String // Ej., 'presupuesto', 'seguimiento', 'confirmacion_pedido', 'recordatorio_pago'
+    url_generada: String // Link a wa.me, mailto:, etc.
+
+ENTIDAD Encargo: // Pedidos de servicios o compras (para Clientes, Freelancers y Microemprendimientos)
+    id: UUID (PK)
+    usuario_id: UUID (FK a Usuario.id del emprendedor / prestador de servicio)
+    cliente_id: UUID (FK a Contacto.id del cliente final) // Puede ser un cliente de Tier 0 o un Contacto del emprendedor
+    producto_id: UUID (FK a Producto.id del item encargado)
+    fecha_solicitud: Timestamp
+    estado: Enum('solicitado', 'en_curso', 'completado', 'cancelado', 'pendiente_pago')
+    descripcion_personalizada: String (detalles específicos del pedido)
+    precio_final_acordado: Float
+    ganancia_neta_encargo: Float // Calculada
+
+    // Atributos específicos si es un servicio/producto digital
+    progreso_porcentaje: Integer (0-100)
+    link_entrega_digital: String // URL a Wetransfer/Drive si es bien digital
+
+    // Atributos específicos si es un producto físico/con envío
+    proveedor_encomienda: String
+    costo_envio: Float
+    progreso_envio: Enum('despachado', 'en_transito', 'entregado', 'pendiente_retiro')
+    tracking_number: String
+
+    reviews_ids: JSONB // Array de IDs de Review
+
+ENTIDAD Review:
+    id: UUID (PK)
+    usuario_cliente_id: UUID (FK a Usuario.id del cliente que dejó la review - si es usuario SOUP)
+    emprendimiento_id: UUID (FK a Negocio.id o Producto.id)
+    rating: Integer (1-5 estrellas)
+    comentario: String
+    fecha_review: Timestamp
+
+ENTIDAD Publicidad:
+    id: UUID (PK)
+    usuario_id: UUID (FK a Usuario.id)
+    item_publicitado_id: UUID // FK a Negocio.id o Producto.id
+    tipo_publicidad: Enum('destacado_marketplace', 'banner_categoria', 'promocion_busqueda')
+    estado: Enum('activo', 'finalizado', 'pendiente', 'pausado')
+    fecha_inicio: Timestamp
+    fecha_fin: Timestamp
+    costo: Float
+    visualizaciones: Integer
+    clics: Integer
+    conversiones: Integer // Ventas concretadas a través de la publicidad
+2. Backend (API con FastAPI)MODULO app/main.py (Configuración, Routers)
+
+MODULO app/auth.py (Autenticación y Autorización)
+    FUNCION registrar_usuario(datos_registro):
+        // Valida datos, hashea contraseña, guarda en DB (Usuario)
+        // Asigna tipo_tier por defecto 'cliente'
+
+    FUNCION iniciar_sesion(email, password):
+        // Verifica credenciales, genera JWT
+        // Devuelve token JWT
+
+    FUNCION get_current_user(token):
+        // Decodifica JWT, obtiene usuario, verifica autenticación y autorización
+
+MODULO app/endpoints/perfil_usuario.py
+    ENDPOINT GET /me:
+        // Obtiene el perfil del usuario logueado (incluye CV para Freelancer si aplica)
+    ENDPOINT PUT /me:
+        // Actualiza el perfil del usuario
+    ENDPOINT PUT /me/cv:
+        // Actualiza el CV del usuario (si es Freelancer)
+
+MODULO app/endpoints/negocios_productos.py
+    ENDPOINT POST /negocios/:
+        // Crea un nuevo Negocio (para Tier 2) o un perfil de Freelancer
+        // Requiere usuario autenticado, tipo_tier apropiado
+    ENDPOINT GET /negocios/{id}:
+        // Obtiene detalles de un Negocio/Freelancer por ID
+    ENDPOINT PUT /negocios/{id}:
+        // Actualiza un Negocio/Freelancer (requiere ser dueño)
+
+    ENDPOINT POST /productos/:
+        // Crea un nuevo Producto/Servicio asociado a un Usuario/Negocio
+        // Calcula COGS y Precio Sugerido usando logica_negocio.calcular_precio_producto()
+        // Guarda en DB (Producto, Insumo)
+    ENDPOINT GET /productos/{id}:
+        // Obtiene detalles de un Producto/Servicio por ID
+    ENDPOINT GET /productos/usuario/me:
+        // Obtiene todos los Productos/Servicios del usuario logueado
+    ENDPOINT PUT /productos/{id}:
+        // Actualiza un Producto/Servicio (requiere ser dueño)
+    ENDPOINT DELETE /productos/{id}:
+        // Borra un Producto/Servicio
+
+MODULO app/endpoints/calculadora_precios.py
+    ENDPOINT POST /calculate_price_suggestion:
+        // Recibe: nombre_producto, lista_insumos [{nombre, costo_unitario, cantidad, unidad}], margen_deseado
+        // Llama a logica_negocio.calcular_precio_producto()
+        // Opcional: Llama a ia_service.sugerir_ajuste_precio()
+        // Devuelve: cogs, precio_sugerido, analisis_ia
+
+MODULO app/endpoints/contactos_mensajes.py
+    ENDPOINT POST /contactos/:
+        // Crea un nuevo Contacto (cliente o proveedor) para el usuario
+    ENDPOINT GET /contactos/me/clientes:
+        // Lista los clientes del usuario
+    ENDPOINT GET /contactos/me/proveedores:
+        // Lista los proveedores del usuario
+    ENDPOINT PUT /contactos/{id}:
+        // Actualiza un contacto
+    ENDPOINT POST /mensajes/registro:
+        // Guarda el contenido de un mensaje enviado externamente (MensajeRegistro)
+        // Devuelve el texto del mensaje formateado y el link_externo para que el frontend lo use (ej., wa.me link)
+    ENDPOINT GET /mensajes/historial/{contacto_id}:
+        // Obtiene el historial de mensajes para un contacto
+
+MODULO app/endpoints/encargos.py
+    ENDPOINT POST /encargos/:
+        // Crea un nuevo Encargo (solicitud de cliente o registro de tarea por emprendedor)
+        // Si es solicitud de cliente, notifica al emprendedor
+    ENDPOINT GET /encargos/me:
+        // Lista los encargos del usuario (solicitados, en curso, completados)
+    ENDPOINT PUT /encargos/{id}/estado:
+        // Actualiza el estado de un encargo
+    ENDPOINT PUT /encargos/{id}/progreso:
+        // Actualiza el porcentaje de progreso de un encargo (para servicios/productos digitales)
+    ENDPOINT PUT /encargos/{id}/envio:
+        // Actualiza el estado de envío (para productos físicos)
+    ENDPOINT POST /encargos/{id}/review:
+        // Permite a un cliente dejar un review para un encargo completado
+
+MODULO app/endpoints/informes.py
+    ENDPOINT GET /informes/ventas:
+        // Genera informe de productos vendidos y ganancias netas por período
+    ENDPOINT GET /informes/horas_trabajo: // Solo para Freelancers
+        // Genera informe de horas trabajadas
+    ENDPOINT GET /informes/insumos_utilizados:
+        // Genera informe del total de insumos utilizados
+
+MODULO app/endpoints/marketplace.py
+    ENDPOINT GET /marketplace/search:
+        // Búsqueda de Negocios y Productos en el agregador público
+        // Filtros: palabra_clave, rubro, ubicacion (PostGIS), tipo_tier, precio_min/max
+        // Ordenamiento: relevancia, distancia, rating, nuevos
+        // Paginación
+    ENDPOINT GET /marketplace/negocios/{id}:
+        // Perfil público de un Negocio/Freelancer en el marketplace
+    ENDPOINT GET /marketplace/productos/{id}:
+        // Detalle público de un Producto/Servicio en el marketplace
+    ENDPOINT GET /marketplace/publicidad/featured:
+        // Obtiene los listados de publicidad premium
+
+MODULO app/endpoints/reviews.py
+    ENDPOINT POST /reviews/:
+        // Crea una nueva review para un producto/negocio/encargo
+    ENDPOINT GET /reviews/item/{item_id}:
+        // Obtiene reviews para un item específico
+
+MODULO app/endpoints/ia_service.py // Servicio interno de IA (no todos los endpoints públicos)
+    FUNCION sugerir_ajuste_precio(datos_producto, datos_mercado_genericos):
+        // Procesa datos y devuelve sugerencias de precio/margen
+    FUNCION generar_insights_negocio(datos_negocio_usuario):
+        // Analiza datos de informes y devuelve consejos proactivos
+
+3. Frontend (UI con React)MODULO src/App.js (Router Principal)
+    // Decide qué vista mostrar según el estado de autenticación y el Tier del usuario
+
+MODULO src/components/Auth.js
+    COMPONENTES LoginScreen, RegisterScreen
+
+MODULO src/components/Dashboard.js
+    // Dashboard principal del emprendedor
+    // Muestra resúmenes de ganancias, productos/servicios, encargos pendientes.
+    // Navegación a las secciones principales (Productos, Clientes, Informes, etc.)
+
+MODULO src/screens/ProfileScreen.js
+    // Muestra y permite editar el perfil del Usuario
+    // Permite subir fotos de perfil
+    // Para Freelancers: Sección de CV (Educación, Experiencia, Habilidades)
+
+MODULO src/screens/BusinessManagementScreen.js // Para Tier 2
+    // Lista de Negocios del usuario
+    // Formulario para Crear Nuevo Negocio (Nombre, Rubro, Descripcion, Localizacion, Fotos)
+
+MODULO src/screens/ProductServiceManagementScreen.js
+    // Lista de Productos/Servicios del usuario/negocio
+    // Botón "Nuevo Producto/Servicio"
+
+    COMPONENT ProductServiceForm:
+        // Formulario para crear/editar Producto/Servicio
+        // Campos: Nombre, Descripción, Rubro, Fotos (subida de imágenes)
+        // SECCIÓN INSUMOS DINÁMICA:
+        //   Botón "Agregar Insumo"
+        //   Para cada insumo: Campos (Nombre, Tipo, Costo Unitario, Cantidad, Unidad)
+        // Calculadora de Precio y COGS:
+        //   Muestra COGS calculado en tiempo real
+        //   Campo para Margen de Ganancias
+        //   Muestra Precio Sugerido
+        //   Botón "Obtener Sugerencia IA" (llama a /calculate_price_suggestion)
+        //   Muestra el Análisis IA (competitividad, ajuste sugerido)
+
+MODULO src/screens/EncargosManagementScreen.js
+    // Tabs: Solicitados, En Curso, Completados
+    // Cada encargo se muestra como una tarjeta
+    // Para "En Curso": Botones para Actualizar Progreso, Enviar Mensaje
+    // Para "Completados": Botones para ver Resumen, Reviews
+
+MODULO src/screens/ClientsSuppliersScreen.js
+    // Tabs: Clientes, Proveedores
+    // Lista de Contactos (Nombre, Info Básica)
+    // Botón "Nuevo Contacto"
+
+    COMPONENT ContactDetailScreen:
+        // Muestra detalles del Contacto
+        // SECCIÓN MENSAJERÍA:
+        //   Área de texto para escribir el mensaje
+        //   Botones para "Plantillas IA", "Sugerencia de Texto IA"
+        //   Botón "Guardar Mensaje y Enviar Vía..."
+        //     Dropdown/Menu: WhatsApp, Email, Copiar Link/Texto
+        //   Historial de Mensajes Enviados (con contenido y canal)
+
+MODULO src/screens/ReportsScreen.js
+    // Muestra los informes de ventas, ganancias, insumos, horas trabajadas
+    // Posiblemente con gráficos simples (ej., usando una librería de gráficos ligera)
+    // Secciones para "Insights de la IA" (llamadas a /ia/business_coach_insights)
+
+MODULO src/screens/MarketplacePublicScreen.js // El agregador
+    // Barra de Búsqueda (Texto, Rubro, Ubicación)
+    // Componentes de Filtro (Categorías, Tipo de Negocio/Servicio, Rango de Precios)
+    // Listado de Tarjetas de Emprendimientos/Productos
+    // Componente de Paginación
+    // Carruseles de Destacados (Publicidad Premium)
+
+MODULO src/screens/PublicProfileScreen.js // Perfil público de un Negocio/Freelancer en el Marketplace
+    // Header (Logo/Fotos, Nombre, Rubro, Ubicación, Rating)
+    // Sección "Sobre Nosotros" / CV
+    // Botones de Contacto (WhatsApp, Email, Redes)
+    // Listado de Productos/Servicios del emprendedor (clicables)
+    // Sección de Reviews
+
+MODULO src/screens/PublicProductDetailScreen.js // Página pública de un Producto/Servicio
+    // Galería de Fotos
+    // Nombre, Descripción, Precio
+    // Información de Insumos (Opcional, si el emprendedor elige mostrar)
+    // Botón "Encargar" / "Pedir Presupuesto" (abre el formulario de contacto o el link wa.me)
+    // Información de Entrega
+    // Link al Perfil del Emprendedor
+    // Sección de Reviews
+
+=======================================================================================.
+
+
+4. Flujos de Lógica Clave (Alto Nivel)
+
+a. Flujo: Creación de Producto/Servicio con Precio Inteligente
+Emprendedor (Frontend): Inicia "Nuevo Producto/Servicio".
+Frontend: Recopila nombre, descripcion, fotos, tipo_producto.
+Frontend (UI Insumos): Permite al emprendedor añadir N Insumos (Nombre, Costo Unitario, Cantidad, Unidad). Calcula Costo Neto por insumo.
+Frontend (UI Calculadora): Muestra COGS = Suma(Costo Neto Insumos).
+Emprendedor (Frontend): Ingresa Margen de Ganancia %.
+Frontend (UI Calculadora): Calcula Precio Sugerido = COGS * (1 + Margen / 100).
+Emprendedor (Frontend): Clic en "Guardar" o "Obtener Sugerencia IA".
+Frontend: Envía Producto data completa, Insumos y Margen a POST /productos/ (o a /calculate_price_suggestion).
+Backend (FastAPI - productos o calculadora_precios):
+Recibe los datos.
+Valida.
+Llama a ia_service.sugerir_ajuste_precio() con los COGS, Rubro y Margen.
+Guarda Producto e Insumos en DB.
+Backend: Devuelve precio_sugerido, cogs, y el analisis_ia (si se solicitó).
+Frontend: Muestra el resultado y el feedback de la IA al emprendedor.
+
+b. Flujo: Búsqueda y Descubrimiento en el Marketplace
+Cliente (Frontend): Ingresa búsqueda en barra o aplica filtros.
+Frontend: Envía GET /marketplace/search con palabra_clave, rubro, localizacion, tipo_tier, etc.
+Backend (FastAPI - marketplace):
+Recibe los parámetros de búsqueda.
+Construye una consulta compleja a la DB (PostgreSQL, usando LIKE para texto, JSONB_OPS para atributos, PostGIS para ubicación).
+Ejecuta la consulta, aplica ordenamiento y paginación.
+Devuelve una lista de Negocio/Producto simplificados para las tarjetas.
+Frontend: Renderiza las tarjetas de resultados.
+Cliente (Frontend): Clic en una tarjeta.
+Frontend: Navega a PublicProfileScreen o PublicProductDetailScreen, haciendo GET /marketplace/negocios/{id} o /marketplace/productos/{id}.
+Backend: Devuelve el detalle completo del objeto.
+Frontend: Renderiza la página de detalle.
+
+c. Flujo: Envío de Mensaje con Contexto
+Emprendedor (Frontend): Inicia "Nuevo Mensaje" desde un Contacto.
+Frontend: Presenta el editor de texto.
+Emprendedor (Frontend): Escribe el contenido del mensaje. (IA puede sugerir plantillas).
+Emprendedor (Frontend): Clic en "Guardar Mensaje y Enviar Vía...".
+Frontend: Envía POST /mensajes/registro con contacto_id, usuario_id, canal, contenido, proposito.
+Backend (FastAPI - contactos_mensajes):
+Recibe y valida los datos.
+Guarda el MensajeRegistro en DB.
+Devuelve el contenido formateado y el url_externa (ej., wa.me link con el mensaje codificado).
+Frontend: Abre la nueva ventana/pestaña del navegador con el url_externa o copia el texto al portapapeles, según el canal seleccionado.
+
+5. Integración de IA (InteligenciaContextual)
+IA para Precios: Invocada por calculate_price_suggestion (ver flujo).
+IA para Informes/Insights: Invocada por GET /reports/ia_insights (analiza los datos de Informes del usuario y devuelve sugerencias o alertas proactivas).
+IA para Mensajes: Sugiere plantillas o auto-completa el texto en el editor de mensajes.
+
+
+
+		

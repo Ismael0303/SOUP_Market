@@ -1,0 +1,30 @@
+# Virtual environment
+venv/
+.venv/
+
+# Byte-code files
+*.pyc
+__pycache__/
+
+# Logs
+*.log
+
+# Database files (if using SQLite or similar)
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.flaskenv
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test / Coverage
+.coverage
+.pytest_cache/
+htmlcov/
