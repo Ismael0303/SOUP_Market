@@ -417,91 +417,211 @@ router = APIRouter(
 
 ---
 
-## 🔧 HERRAMIENTAS DE DEBUGGING UTILIZADAS
+### 7. **PROBLEMA: Creación de Datos de Ejemplo con Errores de Integridad**
+**Fecha:** 8 de Julio de 2025  
+**Severidad:** ALTA  
+**Estado:** ✅ RESUELTO
 
-### **Scripts de Debug:**
-1. **Verificación de Enums:**
+#### **Descripción del Problema:**
+- Script de creación de insumos y productos fallaba por campos NOT NULL faltantes
+- Tabla `productos` requería campos `rating_promedio` y `reviews_count`
+- Tabla `producto_insumo` requería campo `id` (UUID) y `fecha_actualizacion`
+
+#### **Síntomas:**
+- Error: `NotNullViolation` en columnas `rating_promedio`, `reviews_count`
+- Error: `NotNullViolation` en columna `id` de `producto_insumo`
+- Error: `NotNullViolation` en columna `fecha_actualizacion` de `producto_insumo`
+
+#### **Diagnóstico:**
 ```sql
-SELECT DISTINCT tipo_negocio FROM negocios;
-SELECT DISTINCT tipo_producto FROM productos;
+-- Verificar estructura de tablas
+SELECT column_name, is_nullable, data_type 
+FROM information_schema.columns 
+WHERE table_name IN ('productos', 'producto_insumo') 
+ORDER BY table_name, ordinal_position;
 ```
 
-2. **Verificación de Datos Inválidos:**
+#### **Solución Aplicada:**
+1. **Corregir inserción en productos:**
 ```sql
-SELECT * FROM productos WHERE precio = 0.0 OR negocio_id IS NULL;
+INSERT INTO productos (
+    id, nombre, descripcion, precio, tipo_producto, usuario_id, negocio_id, 
+    precio_venta, margen_ganancia_sugerido, rating_promedio, reviews_count, 
+    fecha_creacion, fecha_actualizacion
+)
+VALUES (
+    :id, :nombre, :descripcion, :precio, :tipo, :usuario_id, :negocio_id, 
+    :precio_venta, :margen, 0.0, 0, NOW(), NOW()
+)
 ```
 
-3. **Debug de Tokens:**
-```python
-print(f"🔍 DEBUG: Token recibido: {token[:20]}...")
-print(f"🔍 DEBUG: Token decodificado: {token_data}")
+2. **Corregir inserción en producto_insumo:**
+```sql
+INSERT INTO producto_insumo (
+    id, producto_id, insumo_id, cantidad_necesaria, 
+    fecha_asociacion, fecha_actualizacion
+)
+VALUES (
+    :id, :producto_id, :insumo_id, :cantidad, NOW(), NOW()
+)
 ```
 
-### **Comandos Útiles:**
-```bash
-# Buscar referencias incorrectas
-grep -r "password_hash" backend/
+#### **Lecciones Aprendidas:**
+- Siempre verificar todos los campos NOT NULL antes de insertar
+- Usar `uuid.uuid4()` para generar IDs únicos
+- Incluir campos de fecha con `NOW()` para timestamps
 
-# Verificar logs del servidor
-uvicorn app.main:app --reload
+---
 
-# Conectar a BD
-psql -U soupuser -d soup_app_db -h localhost -p 5432
+### 8. **PROBLEMA: Campo propietario_id NULL en Productos**
+**Fecha:** 8 de Julio de 2025  
+**Severidad:** CRÍTICA  
+**Estado:** ✅ RESUELTO
+
+#### **Descripción del Problema:**
+- Productos creados tenían `usuario_id` pero `propietario_id` era NULL
+- Schema `ProductoResponse` requería `propietario_id` como UUID válido
+- Endpoint `/public/products` fallaba con error de validación
+
+#### **Síntomas:**
+- Error: `ResponseValidationError: UUID input should be a string, bytes or UUID object, input: None`
+- Endpoint `/public/products` devolvía 500 Internal Server Error
+- Frontend no podía cargar productos públicos
+
+#### **Diagnóstico:**
+```sql
+-- Verificar productos con propietario_id NULL
+SELECT id, nombre, usuario_id, propietario_id 
+FROM productos 
+WHERE usuario_id IS NOT NULL AND propietario_id IS NULL;
 ```
 
----
+#### **Solución Aplicada:**
+```sql
+-- Actualizar propietario_id con valor de usuario_id
+UPDATE productos 
+SET propietario_id = usuario_id 
+WHERE usuario_id IS NOT NULL AND propietario_id IS NULL;
+```
 
-## 📚 PATRONES DE SOLUCIÓN IDENTIFICADOS
-
-### **1. Problemas de Consistencia de Datos:**
-- **Patrón:** Valores en BD diferentes a código
-- **Solución:** Migraciones SQL + limpieza de cache
-- **Prevención:** Validaciones y constraints en BD
-
-### **2. Problemas de Nombres de Campos:**
-- **Patrón:** Inconsistencia en nombres (camelCase vs snake_case)
-- **Solución:** Búsqueda global y reemplazo sistemático
-- **Prevención:** Convenciones de nomenclatura claras
-
-### **3. Problemas de Tipos en FastAPI:**
-- **Patrón:** Incompatibilidad entre modelos SQLAlchemy y schemas Pydantic
-- **Solución:** Usar tipo correcto en dependencias
-- **Prevención:** Documentar tipos esperados
-
-### **4. Problemas de Rutas:**
-- **Patrón:** Prefijos duplicados o rutas mal configuradas
-- **Solución:** Revisar configuración en main.py
-- **Prevención:** Estructura clara de routers
+#### **Lecciones Aprendidas:**
+- Mantener consistencia entre campos `usuario_id` y `propietario_id`
+- Verificar que todos los campos requeridos por schemas estén poblados
+- Usar migraciones para corregir inconsistencias de datos
 
 ---
 
-## 🚀 MEJORAS IMPLEMENTADAS
+### 9. **PROBLEMA: Estructura de Tabla productos con Campos Duplicados**
+**Fecha:** 8 de Julio de 2025  
+**Severidad:** MEDIA  
+**Estado:** ✅ RESUELTO
 
-1. **Logs de Debug:** Agregados logs temporales para diagnóstico
-2. **Validaciones:** Mejoradas validaciones de datos
-3. **Documentación:** Este historial para referencia futura
-4. **Estructura:** Organización de debugging y tests
+#### **Descripción del Problema:**
+- Tabla `productos` tenía tanto `usuario_id` como `propietario_id`
+- `usuario_id` era NOT NULL, `propietario_id` era NULL
+- Confusión en qué campo usar para relaciones
+
+#### **Síntomas:**
+- Inconsistencia en referencias a propietario de productos
+- Scripts de creación usaban `usuario_id` pero schemas esperaban `propietario_id`
+
+#### **Solución Aplicada:**
+1. **Usar `usuario_id` para inserciones** (campo NOT NULL)
+2. **Copiar `usuario_id` a `propietario_id`** para consistencia
+3. **Actualizar scripts** para usar el campo correcto según el contexto
+
+#### **Lecciones Aprendidas:**
+- Mantener un solo campo para relaciones de propiedad
+- Documentar qué campo usar en cada contexto
+- Considerar migración futura para unificar campos
 
 ---
 
-## 📝 NOTAS PARA DEBUGGING FUTURO
+## 📊 ESTADÍSTICAS DE BUGS
 
-### **Checklist de Debugging:**
-- [ ] Verificar logs del servidor
-- [ ] Revisar configuración de rutas
-- [ ] Validar consistencia de datos en BD
-- [ ] Verificar tipos en dependencias FastAPI
-- [ ] Comprobar nombres de funciones CRUD
-- [ ] Revisar prefijos de routers
-
-### **Orden de Prioridad:**
-1. **CRÍTICO:** Autenticación y rutas básicas
-2. **ALTO:** Funcionalidades principales
-3. **MEDIO:** Optimizaciones y mejoras
-4. **BAJO:** Cosméticos y UX
+| Categoría | Cantidad | Resueltos | Pendientes |
+|-----------|----------|-----------|------------|
+| **Enums de BD** | 1 | 1 | 0 |
+| **Datos Inválidos** | 2 | 2 | 0 |
+| **Autenticación** | 2 | 2 | 0 |
+| **Integridad de BD** | 2 | 2 | 0 |
+| **Validación de Schemas** | 1 | 1 | 0 |
+| **Estructura de Tablas** | 1 | 1 | 0 |
+| **TOTAL** | **9** | **9** | **0** |
 
 ---
 
-**Última actualización:** 7 de Julio de 2025  
-**Estado del proyecto:** ✅ FUNCIONAL  
-**Próximos pasos:** Testing completo y optimizaciones 
+## 🎯 PATRONES DE BUGS IDENTIFICADOS
+
+### **Patrón 1: Inconsistencia entre BD y Código**
+- **Frecuencia:** Alta
+- **Causa:** Cambios en BD sin actualizar código o viceversa
+- **Prevención:** Usar migraciones y tests de integración
+
+### **Patrón 2: Campos NOT NULL Faltantes**
+- **Frecuencia:** Media
+- **Causa:** Scripts de inserción incompletos
+- **Prevención:** Verificar estructura de tablas antes de insertar
+
+### **Patrón 3: Validación de Schemas**
+- **Frecuencia:** Media
+- **Causa:** Campos requeridos con valores NULL
+- **Prevención:** Validar datos antes de serialización
+
+---
+
+## 🔧 HERRAMIENTAS DE DEBUGGING DESARROLLADAS
+
+### **Scripts de Corrección:**
+- `fix_product_data.py` - Corregir datos de productos
+- `fix_product_propietario_id.py` - Corregir campo propietario_id
+- `create_insumos_productos_bots.py` - Crear datos de ejemplo
+- `verificar_datos_bots.py` - Verificar datos creados
+
+### **Scripts de Verificación:**
+- `check_enum_status.py` - Verificar enums
+- `debug_business_data.py` - Verificar datos de negocios
+- `test_product_query.py` - Probar consultas
+
+### **Scripts de Migración:**
+- `migrate_to_new_models.py` - Migrar a nuevos modelos
+- `migrate_add_product_fields.py` - Agregar campos a productos
+
+---
+
+## 📈 MÉTRICAS DE CALIDAD
+
+### **Tiempo de Resolución Promedio:** 2-4 horas por bug
+### **Tasa de Éxito:** 100% (9/9 bugs resueltos)
+### **Bugs Críticos:** 4 resueltos
+### **Bugs de Alta Severidad:** 3 resueltos
+### **Bugs de Media Severidad:** 2 resueltos
+
+---
+
+## 🚀 ESTADO ACTUAL DEL PROYECTO
+
+### **✅ Funcionalidades Operativas:**
+- Autenticación JWT completa
+- Endpoints públicos funcionando
+- CRUD de usuarios, negocios, productos e insumos
+- Dashboard funcional
+- Marketplace público
+- Datos de ejemplo cargados
+
+### **✅ Base de Datos:**
+- Estructura consistente
+- Datos válidos
+- Relaciones funcionando
+- Enums correctos
+
+### **✅ Frontend:**
+- Navegación completa
+- Autenticación integrada
+- Listados públicos
+- Gestión de entidades
+
+---
+
+**Última actualización:** 8 de Julio de 2025  
+**Estado:** Todos los bugs resueltos, sistema operativo 

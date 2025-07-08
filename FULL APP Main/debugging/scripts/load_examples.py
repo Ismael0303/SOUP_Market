@@ -23,6 +23,9 @@ import uuid
 backend_path = Path(__file__).parent.parent.parent / "backend"
 sys.path.insert(0, str(backend_path))
 
+# Cambiar al directorio backend para importaciones correctas
+os.chdir(backend_path)
+
 try:
     from app.database import get_db, engine
     from app.models import Base
@@ -31,10 +34,12 @@ try:
     from app.crud import product as crud_product
     from app.crud import insumo as crud_insumo
     from app.schemas import UsuarioCreate, NegocioCreate, ProductoCreate, InsumoCreate
-    from app.core.security import get_password_hash
+    from app.auth import get_password_hash
 except ImportError as e:
     print(f"Error importando módulos del backend: {e}")
     print("Asegúrate de que el backend esté configurado correctamente.")
+    print(f"Directorio actual: {os.getcwd()}")
+    print(f"Backend path: {backend_path}")
     sys.exit(1)
 
 
