@@ -6,7 +6,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from app.database import get_db
-from app.schemas import NegocioResponse, ProductoResponse, UserPublicResponse # Import public schemas
+from app.schemas import NegocioResponse, ProductoResponse, UsuarioPublicResponse # Import public schemas
 from app.crud import business as crud_business
 from app.crud import product as crud_product
 from app.crud import user as crud_user # Import user CRUD for public profile
@@ -86,7 +86,7 @@ def get_public_product_detail(product_id: UUID, db: Session = Depends(get_db)):
 
 @router.get(
     "/users/{user_id}",
-    response_model=UserPublicResponse,
+    response_model=UsuarioPublicResponse,
     summary="Get public user profile by ID",
     description="Retrieves the public profile details of a specific user by their ID."
 )

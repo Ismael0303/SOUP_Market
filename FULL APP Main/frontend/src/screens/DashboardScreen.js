@@ -34,6 +34,9 @@ function DashboardScreen() {
     );
   }
 
+  // Variable para clarificar la lógica de roles. Un "provider" es quien ofrece negocios o servicios.
+  const isProvider = user.tipo_tier === 'microemprendimiento' || user.tipo_tier === 'freelancer';
+
   return (
     <div className="container mx-auto p-4 max-w-4xl mt-8">
       <Card className="rounded-xl shadow-lg p-6 space-y-6">
@@ -67,15 +70,21 @@ function DashboardScreen() {
               <h3 className="text-xl font-semibold mb-2 text-green-800 dark:text-green-200">Acciones Rápidas</h3>
               <div className="space-y-2">
                 {/* Botón para Gestionar Negocios (visible para microemprendimiento y freelancer) */}
-                {user.tipo_tier !== 'client' && (
+                {isProvider && (
                   <Link to="/dashboard/businesses" className="block">
                     <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Negocios</Button>
                   </Link>
                 )}
                 {/* Botón para Gestionar Productos/Servicios (visible para microemprendimiento y freelancer) */}
-                {user.tipo_tier !== 'client' && (
-                  <Link to="/dashboard/products" className="block"> {/* Nueva ruta para productos */}
+                {isProvider && (
+                  <Link to="/dashboard/products" className="block">
                     <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Productos/Servicios</Button>
+                  </Link>
+                )}
+                {/* Botón para Gestionar Insumos (visible para microemprendimiento y freelancer) */}
+                {isProvider && (
+                  <Link to="/dashboard/insumos" className="block">
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Insumos</Button>
                   </Link>
                 )}
                 <Link to="/my-encargos" className="block">

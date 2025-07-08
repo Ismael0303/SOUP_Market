@@ -116,3 +116,14 @@ export const deleteProduct = async (productId) => {
   });
   return handleResponse(response);
 };
+
+// Exportar todas las funciones como un objeto por defecto para compatibilidad
+const productApi = {
+  createProduct,
+  getMyProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+};
+
+export default productApi;

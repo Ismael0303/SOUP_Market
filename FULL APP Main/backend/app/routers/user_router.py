@@ -1,103 +1,85 @@
-from typing import Optional, Dict, Any
-import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
+from typing import Optional
+import uuid
 
 from app.database import get_db
-from app.schemas import UserResponse
-from app.crud import user as crud_user # Alias for CRUD operations
-from app.dependencies import get_current_user # Dependency to get the current authenticated user
-from app.models import Usuario, UserTier # Import UserTier enum
+from app.schemas import UsuarioResponse
+from app.crud import user as crud_user
+from app.dependencies import get_current_user
+from app.models import Usuario
 
-# Create an API router specifically for user profile related endpoints
+# Create an API router specifically for user-related endpoints
 router = APIRouter()
 
-@router.get("/me", response_model=UserResponse)
-async def read_current_user(current_user: Usuario = Depends(get_current_user)):
+@router.get("/me", response_model=UsuarioResponse)
+def get_current_user_profile(current_user: Usuario = Depends(get_current_user)):
     """
-    Retrieves the profile of the currently authenticated user.
+    Retrieves the current user's profile information.
     Args:
-        current_user: The Usuario object obtained from the get_current_user dependency.
+        current_user: The current authenticated user (injected by dependency).
     Returns:
-        The current user's data as a UserResponse.
+        The current user's data as a UsuarioResponse.
     """
     return current_user
 
-@router.put("/me", response_model=UserResponse)
-async def update_current_user_profile(
-    user_data: Dict[str, Any], # Use Dict[str, Any] for partial updates
+@router.put("/me", response_model=UsuarioResponse)
+def update_current_user_profile(
+    user_update: dict,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Updates the profile of the currently authenticated user.
-    Allowed fields for update: nombre, localizacion, info_contacto, password.
+    Updates the current user's profile information.
     Args:
-        user_data: Dictionary with the fields to update (e.g., {"nombre": "Nuevo Nombre"}).
-        current_user: The Usuario object of the authenticated user.
+        user_update: A dictionary containing the fields to update.
+        current_user: The current authenticated user (injected by dependency).
         db: The SQLAlchemy database session dependency.
     Returns:
-        The updated user's data as a UserResponse.
+        The updated user's data as a UsuarioResponse.
     Raises:
-        HTTPException 400: If the email is being updated to an existing email or other invalid data.
-        HTTPException 403: If trying to change the user's tier.
+        HTTPException 404: If the user is not found.
     """
-    # Prevent changing email through this endpoint for simplicity and security (requires re-verification)
-    if "email" in user_data and user_data["email"] != current_user.email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email cannot be changed via this endpoint. Please contact support or use a dedicated email change process."
-        )
-    
-    # Prevent changing user tier through this endpoint
-    if "tipo_tier" in user_data and user_data["tipo_tier"] != current_user.tipo_tier.value:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User tier cannot be changed directly."
-        )
-
-    # Filter allowed fields to prevent arbitrary updates
-    allowed_fields = {"nombre", "localizacion", "info_contacto", "password"}
-    update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
-
-    if not update_data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No valid fields provided for update."
-        )
-
-    updated_user = crud_user.update_user_profile(db, current_user.id, update_data)
+    # Update the user's profile in the database
+    updated_user = crud_user.update_user_profile(db, current_user.id, user_update)
     if not updated_user:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update user profile.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
     return updated_user
 
-@router.put("/me/cv", response_model=UserResponse)
-async def update_current_user_cv(
-    cv_data: Dict[str, Any],
+@router.put("/me/cv", response_model=UsuarioResponse)
+def update_current_user_cv(
+    cv_data: dict,
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Updates the curriculum vitae (CV) of the currently authenticated freelancer user.
+    Updates the current freelancer's curriculum vitae.
     Args:
-        cv_data: Dictionary containing CV details (education, experience, skills, etc.).
-        current_user: The Usuario object of the authenticated user.
+        cv_data: A dictionary containing CV details.
+        current_user: The current authenticated user (injected by dependency).
         db: The SQLAlchemy database session dependency.
     Returns:
-        The updated user's data with CV details as a UserResponse.
+        The updated user's data with CV details as a UsuarioResponse.
     Raises:
+        HTTPException 404: If the user is not found.
         HTTPException 403: If the user is not a freelancer.
-        HTTPException 500: If the CV update fails.
     """
-    # Ensure only freelancers can update their CV
-    if current_user.tipo_tier != UserTier.FREELANCER:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only freelancer users can update their CV."
-        )
-    
+    # Update the user's CV in the database
     updated_user = crud_user.update_user_cv(db, current_user.id, cv_data)
     if not updated_user:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update CV.")
+        # Check if user exists but is not a freelancer
+        user = crud_user.get_user_by_id(db, current_user.id)
+        if user and user.tipo_tier.value != "freelancer":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only freelancers can update their CV"
+            )
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
     return updated_user
 

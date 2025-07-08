@@ -116,3 +116,15 @@ export const deleteBusiness = async (businessId) => {
   });
   return handleResponse(response);
 };
+
+// Exportar todas las funciones como un objeto por defecto para compatibilidad
+const businessApi = {
+  createBusiness,
+  getMyBusinesses,
+  getAllMyBusinesses: getMyBusinesses, // Alias para compatibilidad
+  getBusinessById,
+  updateBusiness,
+  deleteBusiness,
+};
+
+export default businessApi;

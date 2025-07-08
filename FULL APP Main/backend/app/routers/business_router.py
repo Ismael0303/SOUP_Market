@@ -3,163 +3,149 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from uuid import UUID
+import uuid
 
-from app.database import get_db # Importa la función para obtener la sesión de DB
-from app.schemas import NegocioCreate, NegocioUpdate, NegocioResponse, UserResponse # Importa los esquemas
-from app.crud import business as crud_business # <-- Volvemos a importar directamente
-# Si business_router necesita crud_product en el futuro, se importaría aquí directamente también
-from app.dependencies import get_current_user # Para obtener el usuario autenticado
+from app.database import get_db
+from app.schemas import NegocioCreate, NegocioUpdate, NegocioResponse, UsuarioResponse # Importa los esquemas
+from app.crud import business as crud_business
+from app.dependencies import get_current_user
 
-# Crea un nuevo router de FastAPI
+# Create an API router specifically for business-related endpoints
 router = APIRouter()
 
-# Endpoint para crear un nuevo negocio (protegido)
-@router.post(
-    "/",
-    response_model=NegocioResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Crear un nuevo negocio",
-    description="Permite a un usuario autenticado (microemprendimiento o freelancer) crear un nuevo negocio."
-)
+@router.post("/", response_model=NegocioResponse, status_code=status.HTTP_201_CREATED)
 def create_business(
     business: NegocioCreate,
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: UsuarioResponse = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Crea un nuevo negocio para el usuario autenticado.
-    Solo los usuarios con tipo_tier 'microemprendimiento' o 'freelancer' pueden crear negocios.
+    Creates a new business for the current user.
+    Args:
+        business: NegocioCreate Pydantic model containing business data.
+        current_user: The current authenticated user (injected by dependency).
+        db: The SQLAlchemy database session dependency.
+    Returns:
+        The newly created business as a NegocioResponse.
     """
-    # Verifica si el tipo de usuario tiene permiso para crear negocios
-    if current_user.tipo_tier not in ["microemprendimiento", "freelancer"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Solo microemprendimientos y freelancers pueden crear negocios."
-        )
-    
-    db_business = crud_business.create_business(db, user_id=current_user.id, business=business)
-    return db_business
+    return crud_business.create_business(db=db, user_id=current_user.id, business=business)
 
-
-# Endpoint para obtener todos los negocios del usuario autenticado (protegido)
-@router.get(
-    "/me",
-    response_model=List[NegocioResponse],
-    summary="Obtener mis negocios",
-    description="Obtiene todos los negocios asociados al usuario autenticado."
-)
+@router.get("/me", response_model=List[NegocioResponse])
 def get_my_businesses(
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: UsuarioResponse = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Retorna una lista de todos los negocios que pertenecen al usuario autenticado.
+    Retrieves all businesses owned by the current user.
+    Args:
+        current_user: The current authenticated user (injected by dependency).
+        db: The SQLAlchemy database session dependency.
+    Returns:
+        A list of businesses owned by the current user.
     """
-    businesses = crud_business.get_businesses_by_user_id(db, user_id=current_user.id)
-    return businesses
+    return crud_business.get_businesses_by_user_id(db, user_id=current_user.id)
 
-
-# Endpoint para obtener un negocio específico por ID (protegido, debe ser del usuario)
-@router.get(
-    "/{business_id}",
-    response_model=NegocioResponse,
-    summary="Obtener detalle de un negocio",
-    description="Obtiene los detalles de un negocio específico por su ID, si pertenece al usuario autenticado."
-)
-def get_business_detail(
-    business_id: UUID,
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+@router.get("/{business_id}", response_model=NegocioResponse)
+def get_business(
+    business_id: uuid.UUID,
+    current_user: UsuarioResponse = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Retorna los detalles de un negocio específico.
-    Verifica que el negocio pertenezca al usuario autenticado.
+    Retrieves a specific business by its ID.
+    Args:
+        business_id: The UUID of the business to retrieve.
+        current_user: The current authenticated user (injected by dependency).
+        db: The SQLAlchemy database session dependency.
+    Returns:
+        The business details as a NegocioResponse.
+    Raises:
+        HTTPException 404: If the business is not found.
+        HTTPException 403: If the user doesn't own the business.
     """
-    db_business = crud_business.get_business_by_id(db, business_id=business_id)
-    if not db_business:
+    print(f"DEBUG: Recibiendo request para business_id: {business_id}")
+    business = crud_business.get_business_by_id(db, business_id=business_id)
+    if not business:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Negocio no encontrado."
+            detail="Business not found"
         )
-    if db_business.usuario_id != current_user.id:
+    
+    # Ensure the current user owns this business
+    if business.propietario_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para acceder a este negocio."
+            detail="Not authorized to access this business"
         )
-    return db_business
+    
+    return business
 
-
-# Endpoint para actualizar un negocio existente (protegido, debe ser del usuario)
-@router.put(
-    "/{business_id}",
-    response_model=NegocioResponse,
-    summary="Actualizar un negocio",
-    description="Actualiza los detalles de un negocio existente por su ID, si pertenece al usuario autenticado."
-)
+@router.put("/{business_id}", response_model=NegocioResponse)
 def update_business(
-    business_id: UUID,
+    business_id: uuid.UUID,
     business_update: NegocioUpdate,
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: UsuarioResponse = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Actualiza un negocio existente.
-    Verifica que el negocio pertenezca al usuario autenticado.
+    Updates a specific business by its ID.
+    Args:
+        business_id: The UUID of the business to update.
+        business_update: NegocioUpdate Pydantic model containing the fields to update.
+        current_user: The current authenticated user (injected by dependency).
+        db: The SQLAlchemy database session dependency.
+    Returns:
+        The updated business as a NegocioResponse.
+    Raises:
+        HTTPException 404: If the business is not found.
+        HTTPException 403: If the user doesn't own the business.
     """
-    db_business = crud_business.get_business_by_id(db, business_id=business_id)
-    if not db_business:
+    # First, get the business to check ownership
+    business = crud_business.get_business_by_id(db, business_id=business_id)
+    if not business:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Negocio no encontrado."
-        )
-    if db_business.usuario_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para actualizar este negocio."
+            detail="Business not found"
         )
     
-    updated_business = crud_business.update_business(db, business_id=business_id, business_update=business_update)
-    if not updated_business:
-        # Esto solo debería ocurrir si el negocio fue eliminado justo antes de la actualización
+    # Ensure the current user owns this business
+    if business.propietario_id != current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error al actualizar el negocio."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to update this business"
         )
-    return updated_business
+    
+    return crud_business.update_business(db, business_id=business_id, business_update=business_update)
 
-
-# Endpoint para eliminar un negocio (protegido, debe ser del usuario)
-@router.delete(
-    "/{business_id}",
-    status_code=status.HTTP_200_OK,
-    summary="Eliminar un negocio",
-    description="Elimina un negocio existente por su ID, si pertenece al usuario autenticado."
-)
+@router.delete("/{business_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_business(
-    business_id: UUID,
-    db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    business_id: uuid.UUID,
+    current_user: UsuarioResponse = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
-    Elimina un negocio existente.
-    Verifica que el negocio pertenezca al usuario autenticado.
+    Deletes a specific business by its ID.
+    Args:
+        business_id: The UUID of the business to delete.
+        current_user: The current authenticated user (injected by dependency).
+        db: The SQLAlchemy database session dependency.
+    Raises:
+        HTTPException 404: If the business is not found.
+        HTTPException 403: If the user doesn't own the business.
     """
-    db_business = crud_business.get_business_by_id(db, business_id=business_id)
-    if not db_business:
+    # First, get the business to check ownership
+    business = crud_business.get_business_by_id(db, business_id=business_id)
+    if not business:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Negocio no encontrado."
-        )
-    if db_business.usuario_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para eliminar este negocio."
+            detail="Business not found"
         )
     
-    if not crud_business.delete_business(db, business_id=business_id):
+    # Ensure the current user owns this business
+    if business.propietario_id != current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error al eliminar el negocio."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this business"
         )
-    return {"message": "Negocio eliminado exitosamente."}
+    
+    crud_business.delete_business(db, business_id=business_id)

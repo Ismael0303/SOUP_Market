@@ -6,151 +6,158 @@ from typing import List, Optional
 from uuid import UUID
 
 from app.database import get_db
-from app.schemas import ProductoCreate, ProductoUpdate, ProductoResponse, UserResponse
-from app.crud import product as crud_product # <-- Volvemos a importar directamente
-from app.crud import business as crud_business # <-- Volvemos a importar directamente
+from app.schemas import ProductoCreate, ProductoUpdate, ProductoResponse
+from app.crud import product as crud_product
 from app.dependencies import get_current_user
+from app.models import Usuario, UserTier
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Products & Services"]
+)
 
-# Endpoint to create a new product (protected)
+def _calculate_margen_ganancia_real(db_product) -> Optional[float]:
+    if db_product.cogs is not None and db_product.precio_venta is not None and db_product.cogs > 0:
+        return ((db_product.precio_venta - db_product.cogs) / db_product.cogs) * 100
+    return None
+
 @router.post(
     "/",
     response_model=ProductoResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new product or service",
-    description="Allows an authenticated user (microenterprise or freelancer) to create a new product or service, optionally associating it with one of their businesses."
+    description="Allows an authenticated user to create a new product or service, associating it with a business and optional insumos."
 )
-def create_product(
+def create_product_endpoint(
     product: ProductoCreate,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
-    # Ya no inyectamos crud_product o crud_business aquí
+    current_user: Usuario = Depends(get_current_user)
 ):
-    """
-    Creates a new product/service for the authenticated user.
-    If a business_id is provided, it verifies that the business belongs to the current user.
-    """
-    if current_user.tipo_tier == "client":
+    if current_user.tipo_tier not in [UserTier.MICROEMPRENDIMIENTO, UserTier.FREELANCER]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Clients cannot create products or services."
+            detail="Only micro-entrepreneurs and freelancers can create products/services."
         )
+    # Validar propiedad del negocio
+    business = db.query(current_user.__class__).filter_by(id=product.negocio_id, propietario_id=current_user.id).first()
+    if not business:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Business not found or does not belong to the current user."
+        )
+    try:
+        db_product = crud_product.create_product(db, propietario_id=current_user.id, product=product)
+        response_data = ProductoResponse.model_validate(db_product)
+        response_data.margen_ganancia_real = _calculate_margen_ganancia_real(db_product)
+        return response_data
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    if product.negocio_id:
-        db_business = crud_business.get_business_by_id(db, business_id=product.negocio_id)
-        if not db_business or db_business.usuario_id != current_user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="The specified business does not exist or does not belong to the current user."
-            )
-
-    db_product = crud_product.create_product(db, user_id=current_user.id, product=product)
-    return db_product
-
-
-# Endpoint to get all products/services of the authenticated user (protected)
 @router.get(
     "/me",
     response_model=List[ProductoResponse],
-    summary="Get my products/services",
-    description="Retrieves all products or services associated with the authenticated user."
+    summary="Get all products/services for the current user",
+    description="Retrieves a list of all products or services owned by the current authenticated user."
 )
-def get_my_products(
+def get_all_my_products_endpoint(
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Usuario = Depends(get_current_user)
 ):
-    products = crud_product.get_products_by_user_id(db, user_id=current_user.id)
-    return products
+    products = crud_product.get_all_products_by_user_id(db, propietario_id=current_user.id)
+    response_products = []
+    for p in products:
+        response_data = ProductoResponse.model_validate(p)
+        response_data.margen_ganancia_real = _calculate_margen_ganancia_real(p)
+        response_products.append(response_data)
+    return response_products
 
-
-# Endpoint to get a specific product/service by ID (protected, must belong to the user)
 @router.get(
     "/{product_id}",
     response_model=ProductoResponse,
-    summary="Get product/service details",
-    description="Retrieves the details of a specific product or service by its ID, if it belongs to the authenticated user."
+    summary="Get product/service details by ID",
+    description="Retrieves the details of a specific product or service by its ID. Only accessible by the owner."
 )
-def get_product_detail(
+def get_product_endpoint(
     product_id: UUID,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Usuario = Depends(get_current_user)
 ):
     db_product = crud_product.get_product_by_id(db, product_id=product_id)
     if not db_product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product or service not found."
+            detail="Product/Service not found."
         )
-    if db_product.usuario_id != current_user.id:
+    if db_product.propietario_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to access this product or service."
+            detail="Not authorized to access this product/service."
         )
-    return db_product
+    response_data = ProductoResponse.model_validate(db_product)
+    response_data.margen_ganancia_real = _calculate_margen_ganancia_real(db_product)
+    return response_data
 
-
-# Endpoint to update an existing product/service (protected, must belong to the user)
 @router.put(
     "/{product_id}",
     response_model=ProductoResponse,
-    summary="Update a product/service",
-    description="Updates the details of an existing product or service by its ID, if it belongs to the authenticated user."
+    summary="Update an existing product or service",
+    description="Updates the details of an existing product or service by its ID. Only accessible by the owner."
 )
-def update_product(
+def update_product_endpoint(
     product_id: UUID,
     product_update: ProductoUpdate,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Usuario = Depends(get_current_user)
 ):
     db_product = crud_product.get_product_by_id(db, product_id=product_id)
     if not db_product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product or service not found."
+            detail="Product/Service not found."
         )
-    if db_product.usuario_id != current_user.id:
+    if db_product.propietario_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to update this product or service."
+            detail="Not authorized to update this product/service."
         )
-    
-    updated_product = crud_product.update_product(db, product_id=product_id, product_update=product_update)
-    if not updated_product:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error updating the product or service."
-        )
-    return updated_product
+    if product_update.negocio_id and product_update.negocio_id != db_product.negocio_id:
+        business = db.query(current_user.__class__).filter_by(id=product_update.negocio_id, propietario_id=current_user.id).first()
+        if not business:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="New business not found or does not belong to the current user."
+            )
+    try:
+        updated_product = crud_product.update_product(db, product_id=product_id, product_update=product_update)
+        response_data = ProductoResponse.model_validate(updated_product)
+        response_data.margen_ganancia_real = _calculate_margen_ganancia_real(updated_product)
+        return response_data
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-
-# Endpoint to delete a product/service (protected, must belong to the user)
 @router.delete(
     "/{product_id}",
-    status_code=status.HTTP_200_OK,
-    summary="Delete a product/service",
-    description="Deletes an existing product or service by its ID, if it belongs to the authenticated user."
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a product or service",
+    description="Deletes a product or service by its ID. Only accessible by the owner."
 )
-def delete_product(
+def delete_product_endpoint(
     product_id: UUID,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: Usuario = Depends(get_current_user)
 ):
     db_product = crud_product.get_product_by_id(db, product_id=product_id)
     if not db_product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product or service not found."
+            detail="Product/Service not found."
         )
-    if db_product.usuario_id != current_user.id:
+    if db_product.propietario_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this product or service."
+            detail="Not authorized to delete this product/service."
         )
-    
     if not crud_product.delete_product(db, product_id=product_id):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error deleting the product or service."
+            detail="Failed to delete product/service."
         )
-    return {"message": "Product or service deleted successfully."}

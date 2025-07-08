@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models import Usuario, UserTier
-from app.schemas import UserCreate, UserResponse, UserLogin # Import schemas
+from app.schemas import UsuarioCreate, UsuarioResponse # Import schemas
 from app.auth import get_password_hash # Import password hashing utility
 import uuid # For UUID generation
 
@@ -28,12 +28,12 @@ def get_user_by_id(db: Session, user_id: uuid.UUID) -> Usuario | None:
     """
     return db.query(Usuario).filter(Usuario.id == user_id).first()
 
-def create_user(db: Session, user: UserCreate) -> Usuario:
+def create_user(db: Session, user: UsuarioCreate) -> Usuario:
     """
     Creates a new user in the database.
     Args:
         db: The SQLAlchemy database session.
-        user: A Pydantic UserCreate schema containing user registration data.
+        user: A Pydantic UsuarioCreate schema containing user registration data.
     Returns:
         The newly created Usuario object.
     """
@@ -43,9 +43,9 @@ def create_user(db: Session, user: UserCreate) -> Usuario:
     db_user = Usuario(
         email=user.email,
         nombre=user.nombre,
-        password_hash=hashed_password,
+        hashed_password=hashed_password,
         localizacion=user.localizacion,
-        info_contacto=user.info_contacto,
+        curriculum_vitae=user.curriculum_vitae,
         tipo_tier=user.tipo_tier
     )
     db.add(db_user)  # Add the new user to the session
@@ -68,7 +68,7 @@ def update_user_profile(db: Session, user_id: uuid.UUID, user_data: dict) -> Usu
         for key, value in user_data.items():
             # Special handling for password: hash if provided
             if key == "password" and value:
-                db_user.password_hash = get_password_hash(value)
+                db_user.hashed_password = get_password_hash(value)
             elif hasattr(db_user, key):
                 setattr(db_user, key, value)
         db.commit()

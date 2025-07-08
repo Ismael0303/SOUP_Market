@@ -86,3 +86,14 @@ export const getPublicUser = async (userId) => {
   });
   return handleResponse(response);
 };
+
+// Exportar todas las funciones como un objeto por defecto para compatibilidad
+const publicApi = {
+  getPublicBusinesses,
+  getPublicBusinessById,
+  getPublicProducts,
+  getPublicProductById,
+  getPublicUser,
+};
+
+export default publicApi;

@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm # For form-data login
 
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas import UserCreate, Token, UserResponse # Import UserResponse for registration
+from app.schemas import UsuarioCreate, Token, UsuarioResponse # Import UsuarioResponse for registration
 from app.crud import user as crud_user # Alias to avoid name conflict with 'user' variable
 from app.auth import verify_password, create_access_token
 from app.core.config import settings
@@ -12,8 +12,8 @@ from app.core.config import settings
 # Create an API router specifically for authentication related endpoints
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+@router.post("/register", response_model=UsuarioResponse, status_code=status.HTTP_201_CREATED)
+def register_user(user: UsuarioCreate, db: Session = Depends(get_db)):
     """
     Registers a new user in the system.
     Args:
@@ -60,7 +60,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
 
     # Verify the provided password against the hashed password stored in the database
-    if not verify_password(form_data.password, user.password_hash):
+    if not verify_password(form_data.password, user.hashed_password):
         # If passwords do not match, raise 401 Unauthorized exception
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

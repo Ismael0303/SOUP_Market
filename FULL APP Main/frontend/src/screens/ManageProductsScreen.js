@@ -110,14 +110,18 @@ const ManageProductsScreen = () => {
                       {product.descripcion || 'Sin descripción.'}
                     </p>
                     <div className="flex justify-between items-center mt-3">
-                      <Link to={`/dashboard/products/edit/${product.id}`}>
-                        <Button variant="outline" size="sm">Editar</Button>
-                      </Link>
+                      {product.id ? (
+                        <Link to={`/dashboard/products/edit/${product.id}`}>
+                          <Button variant="outline" size="sm">Editar</Button>
+                        </Link>
+                      ) : (
+                        <Button variant="outline" size="sm" disabled>Editar</Button>
+                      )}
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDelete(product.id)}
-                        disabled={deletingId === product.id}
+                        disabled={deletingId === product.id || !product.id}
                       >
                         {deletingId === product.id ? 'Eliminando...' : 'Eliminar'}
                       </Button>
