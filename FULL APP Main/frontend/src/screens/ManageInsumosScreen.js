@@ -6,6 +6,7 @@ import insumoApi from '../api/insumoApi'; // Importa el servicio API de insumos
 import { useAuth } from '../context/AuthContext'; // Para obtener el estado de autenticación
 import { Button } from '../components/ui/button'; // Componente de botón de Shadcn
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'; // Componentes de tarjeta de Shadcn
+import Layout from '../components/Layout';
 
 const ManageInsumosScreen = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -55,18 +56,22 @@ const ManageInsumosScreen = () => {
 
   if (loading || !isAuthenticated) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <p className="text-gray-800 dark:text-gray-200">Cargando...</p>
-      </div>
+      <Layout>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">Gestión de Insumos</h1>
-
-        <div className="flex justify-end mb-4">
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Gestión de Insumos</h1>
           <Link to="/dashboard/insumos/new">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
               Crear Nuevo Insumo
@@ -84,7 +89,22 @@ const ManageInsumosScreen = () => {
         {isLoadingInsumos ? (
           <p className="text-center">Cargando insumos...</p>
         ) : insumos.length === 0 ? (
-          <p className="text-center">No tienes insumos registrados. ¡Crea uno para empezar!</p>
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <div className="text-gray-500 mb-4">
+              <span className="text-4xl">🧾</span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No tienes insumos registrados
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Comienza creando tu primer insumo
+            </p>
+            <Link to="/dashboard/insumos/new">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Crear Primer Insumo
+              </Button>
+            </Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {insumos.map((insumo) => (
@@ -120,7 +140,7 @@ const ManageInsumosScreen = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

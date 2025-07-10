@@ -1,19 +1,9 @@
-# FastAPI framework for building APIs
-fastapi==0.111.0
-# ASGI server for FastAPI
-uvicorn[standard]==0.29.0
-# SQLAlchemy ORM for database interaction
-SQLAlchemy==2.0.30
-# PostgreSQL driver for SQLAlchemy
-psycopg2-binary<2.9.9,>=2.8
-# For environment variables
-python-dotenv==1.0.1
-# For password hashing (authentication)
-passlib[bcrypt]==1.7.4
-# For JWT token handling (authentication)
-python-jose[cryptography]==3.3.0
-# For UUID generation
-uuid==1.30
-# Pydantic for data validation and serialization
-pydantic==2.5.3
-pydantic-settings==2.1.0
+bcrypt==4.3.0
+certifi==2025.6.15
+charset-normalizer==3.4.2
+idna==3.10
+passlib==1.7.4
+psycopg2-binary==2.9.10
+pyperclip==1.9.0
+requests==2.32.4
+urllib3==2.5.0

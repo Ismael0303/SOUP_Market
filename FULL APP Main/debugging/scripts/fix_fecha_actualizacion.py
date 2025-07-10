@@ -1,74 +1,57 @@
 #!/usr/bin/env python3
 """
-Script para corregir la columna fecha_actualizacion en la tabla usuarios.
-Agrega un valor por defecto para evitar errores de NOT NULL.
+Script simple para corregir fecha_actualizacion en productos
 """
 
+import psycopg2
 import os
-import sys
-from pathlib import Path
 
-# Agregar el directorio backend al path
-backend_path = Path(__file__).parent.parent.parent / "backend"
-sys.path.insert(0, str(backend_path))
-os.chdir(backend_path)
+# Configuración de la base de datos
+DB_CONFIG = {
+    'host': 'localhost',
+    'port': 5432,
+    'database': 'soup_app_db',
+    'user': 'soupuser',
+    'password': 'soup123'
+}
 
-try:
-    from app.database import get_db, engine
-    from sqlalchemy import text
-    
-    print("🔧 Corrigiendo columna fecha_actualizacion...")
-    
-    # Obtener sesión de base de datos
-    db = next(get_db())
-    
+def fix_fecha_actualizacion():
+    """Corregir el problema de fecha_actualizacion"""
     try:
-        # Verificar el estado actual de fecha_actualizacion
-        result = db.execute(text("""
-            SELECT column_name, data_type, is_nullable, column_default
-            FROM information_schema.columns 
-            WHERE table_name = 'usuarios' 
-            AND column_name = 'fecha_actualizacion';
-        """))
+        print("🔧 Corrigiendo fecha_actualizacion en tabla productos...")
         
-        row = result.fetchone()
-        if row:
-            print(f"📋 Estado actual: {row[0]} | {row[1]} | Nullable: {row[2]} | Default: {row[3]}")
-            
-            if row[3] is None:
-                print("⚠️  Columna fecha_actualizacion no tiene valor por defecto")
-                
-                # Agregar valor por defecto
-                print("🔄 Agregando valor por defecto...")
-                db.execute(text("""
-                    ALTER TABLE usuarios 
-                    ALTER COLUMN fecha_actualizacion 
-                    SET DEFAULT now();
-                """))
-                db.commit()
-                print("✅ Valor por defecto agregado exitosamente")
-                
-                # Verificar el cambio
-                result = db.execute(text("""
-                    SELECT column_name, data_type, is_nullable, column_default
-                    FROM information_schema.columns 
-                    WHERE table_name = 'usuarios' 
-                    AND column_name = 'fecha_actualizacion';
-                """))
-                
-                row = result.fetchone()
-                print(f"📋 Estado final: {row[0]} | {row[1]} | Nullable: {row[2]} | Default: {row[3]}")
-            else:
-                print("✅ Columna fecha_actualizacion ya tiene valor por defecto")
+        conn = psycopg2.connect(**DB_CONFIG)
+        cursor = conn.cursor()
         
-        print("\n✅ Corrección completada!")
+        # Agregar valor por defecto a fecha_actualizacion
+        cursor.execute("""
+            ALTER TABLE productos 
+            ALTER COLUMN fecha_actualizacion SET DEFAULT CURRENT_TIMESTAMP
+        """)
+        print("✅ Valor por defecto agregado a fecha_actualizacion")
+        
+        # Actualizar registros existentes que tengan fecha_actualizacion NULL
+        cursor.execute("""
+            UPDATE productos 
+            SET fecha_actualizacion = CURRENT_TIMESTAMP 
+            WHERE fecha_actualizacion IS NULL
+        """)
+        
+        updated_rows = cursor.rowcount
+        print(f"✅ Actualizados {updated_rows} registros con fecha_actualizacion NULL")
+        
+        conn.commit()
+        print("✅ Corrección aplicada exitosamente")
+        return True
         
     except Exception as e:
-        print(f"❌ Error corrigiendo fecha_actualizacion: {e}")
-        db.rollback()
+        print(f"❌ Error: {e}")
+        if 'conn' in locals():
+            conn.rollback()
+        return False
     finally:
-        db.close()
-        
-except ImportError as e:
-    print(f"❌ Error importando módulos: {e}")
-    sys.exit(1) 
+        if 'conn' in locals():
+            conn.close()
+
+if __name__ == "__main__":
+    fix_fecha_actualizacion() 

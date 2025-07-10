@@ -6,6 +6,10 @@ from app.routers import business_router
 from app.routers import product_router
 from app.routers import public_router
 from app.routers import insumo_router # Import the new insumo router
+from app.routers import public_ai_router
+from app.routers import plugin_router # Import the new plugin router
+from app.routers import venta_router # Import the new venta router
+from app.routers import niam_router # Import the new niam router
 
 # Create the FastAPI application instance
 app = FastAPI(
@@ -91,3 +95,7 @@ app.include_router(product_router.router, prefix="/products", tags=["Products & 
 app.include_router(public_router.router, prefix="/public", tags=["Public Listing & Search"])
 # CAMBIO AQUI: Eliminar el prefijo duplicado para insumo_router
 app.include_router(insumo_router.router, tags=["Insumos"])
+app.include_router(public_ai_router.router, tags=["AI Recomendaciones"])
+app.include_router(plugin_router.router, tags=["Plugins"])
+app.include_router(venta_router.router, tags=["Ventas & POS"])
+app.include_router(niam_router.router, tags=["Panadería Ñiam"])

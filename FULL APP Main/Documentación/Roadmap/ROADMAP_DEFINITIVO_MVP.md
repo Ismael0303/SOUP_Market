@@ -148,7 +148,52 @@ frontend/src/
 
 Continuaremos con el desarrollo incremental, añadiendo valor en cada etapa.
 
-### **Capítulo 4: Gestión de Insumos y Cálculo de Costos (Próximo)**
+### **Capítulo ACTUAL: Workflow Interno y Gestión de Ventas en Local (Panadería Ñiam)**
+
+#### **Descripción General:**
+Implementar las funcionalidades clave para que un negocio físico (ej. Panadería Ñiam) pueda usar SOUP como su sistema principal de gestión de ventas en el local, inventario y producción, reemplazando a Excel.
+
+#### **Roles y Funcionalidades Clave:**
+
+**1. 🗣️ Trabajador de Atención al Cliente (Punto de Venta Principal):**
+- **Registro de Ventas en Local:** Nueva pantalla POS (`SalePointScreen.js`) para seleccionar productos, ajustar cantidades y registrar ventas
+- **Consulta de Inventario:** Actualización de `ManageProductsScreen.js` para mostrar stock terminado
+- **Gestión de Pedidos Online:** Módulo futuro para encargos
+
+**2. 👨‍🍳 Cocinero / Productor:**
+- **Gestión de Insumos:** Uso de pantallas existentes (`ManageInsumosScreen`, `CreateInsumoScreen`, `EditInsumoScreen`)
+- **Gestión de Productos:** Uso de pantallas existentes con cálculo de COGS y márgenes
+- **Definir Recetas:** Asociación de insumos a productos (ya implementado)
+
+**3. 📊 Dueños / Managers:**
+- **Visión General:** Actualización de `DashboardScreen.js` y `ManageBusinessesScreen.js`
+- **Análisis de Rentabilidad:** Visualización de COGS, precios y márgenes en `ManageProductsScreen.js`
+
+**4. 🚶 Cliente:**
+- **Compra en Local:** Gestionado por el trabajador de atención al cliente
+- **Exploración Online:** Uso de pantallas públicas existentes
+
+#### **Tareas de Backend:**
+- **models.py:** Añadir campo `stock_terminado` al modelo Producto
+- **crud/product.py:** Implementar función `record_sale` para descuento de inventario
+- **routers/product_router.py:** Nuevo endpoint `POST /products/{product_id}/record_sale`
+- **Migración de BD:** Añadir campo `stock_terminado` a tabla productos
+
+#### **Tareas de Frontend:**
+- **screens/SalePointScreen.js:** Crear nueva pantalla de punto de venta
+- **api/productApi.js:** Añadir función `recordSale`
+- **App.js:** Añadir ruta `/dashboard/pos`
+- **ManageProductsScreen.js:** Actualizar para mostrar stock terminado y métricas financieras
+
+#### **Próximos Pasos Prioritarios:**
+1. Implementar pantalla de punto de venta (POS)
+2. Añadir campo `stock_terminado` al modelo Producto
+3. Implementar lógica de descuento de stock al vender
+4. Actualizar visualización de productos con métricas financieras
+
+---
+
+### **Capítulo 4: Gestión de Insumos y Cálculo de Costos (Completado)**
 
 #### **Descripción UI/UX:**
 - **Dashboard:** Nuevo botón "Gestionar Insumos" para emprendedores

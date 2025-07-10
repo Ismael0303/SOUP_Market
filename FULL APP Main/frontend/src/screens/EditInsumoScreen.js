@@ -8,11 +8,14 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
+import Breadcrumbs from '../components/Breadcrumbs';
+import { useNotification } from '../context/NotificationContext';
 
 const EditInsumoScreen = () => {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const { insumoId } = useParams(); // Obtener el ID del insumo de la URL
+  const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -79,6 +82,7 @@ const EditInsumoScreen = () => {
 
       await insumoApi.updateInsumo(insumoId, dataToSend);
       setSuccessMessage('Insumo actualizado exitosamente!');
+      showNotification('Insumo actualizado correctamente', 'success');
       // Opcional: Redirigir a la lista de insumos después de un breve retraso
       setTimeout(() => {
         navigate('/dashboard/insumos');
@@ -87,6 +91,7 @@ const EditInsumoScreen = () => {
       console.error('Error al actualizar insumo:', err);
       const errorMessage = err.response?.data?.detail || 'Error al actualizar el insumo. Por favor, verifica los datos.';
       setError(errorMessage);
+      showNotification(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -101,8 +106,14 @@ const EditInsumoScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar de navegación */}
+      <main className="flex-1 max-w-4xl mx-auto w-full p-4 sm:p-8">
+        <Breadcrumbs items={[
+          { label: 'Dashboard', to: '/dashboard' },
+          { label: 'Insumos', to: '/dashboard/insumos' },
+          { label: 'Editar Insumo' }
+        ]} />
         <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Editar Insumo</CardTitle>
@@ -192,7 +203,7 @@ const EditInsumoScreen = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   );
 };

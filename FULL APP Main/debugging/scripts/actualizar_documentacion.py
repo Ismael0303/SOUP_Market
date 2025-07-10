@@ -532,11 +532,11 @@ class DocumentacionUpdater:
                 
                 # Si hay una diferencia significativa, agregar discrepancia
                 if abs(documented_endpoints - total_endpoints) > 2:  # Tolerancia de 2 endpoints
-                    discrepancies.append({
-                        'type': 'endpoint_count_mismatch',
-                        'severity': 'medium',
+                            discrepancies.append({
+                                'type': 'endpoint_count_mismatch',
+                                'severity': 'medium',
                         'description': f'Conteo de endpoints desactualizado en Documentación/DOCUMENTACION_TECNICA.md',
-                        'current': total_endpoints,
+                                'current': total_endpoints,
                         'documented': documented_endpoints
                     })
             else:
@@ -632,10 +632,10 @@ class DocumentacionUpdater:
                         if re.search(pattern, content, re.IGNORECASE):
                             content = re.sub(
                                 pattern,
-                                f'Última actualización: {current_date}',
-                                content,
-                                flags=re.IGNORECASE
-                            )
+                        f'Última actualización: {current_date}',
+                        content,
+                        flags=re.IGNORECASE
+                    )
                             break
                     else:
                         # Si no se encuentra ningún patrón, buscar al final del archivo
@@ -893,8 +893,8 @@ class DocumentacionUpdater:
             category_title = category.replace('_', ' ').title()
             section += f"### **{category_title}**\n"
             
-            for feature, implemented in features.items():
-                status = "✅" if implemented else "❌"
+                for feature, implemented in features.items():
+                    status = "✅" if implemented else "❌"
                 feature_name = feature.replace('_', ' ').title()
                 section += f"- {feature_name}: {status}\n"
             

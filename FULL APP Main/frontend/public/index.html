@@ -1,43 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="SOUP Emprendimientos - Tu plataforma para gestionar y crecer tu micro-negocio."
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOUP Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      color: #343a40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.07);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 500px;
+    }
+    .btn-precios {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 2rem;
+      transition: background 0.2s;
+    }
+    .btn-precios:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Variables globales para el sistema de ventas -->
+  <script>
+    // Configuración global de la aplicación
+    window.__app_id = 'soup-emprendimientos';
+    window.__initial_auth_token = null; // Se puede establecer si hay un token inicial
+    
+    // Configuración de Firebase (se puede sobrescribir en producción)
+    window.__firebase_config = {
+      apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      authDomain: "soup-emprendimientos.firebaseapp.com",
+      projectId: "soup-emprendimientos",
+      storageBucket: "soup-emprendimientos.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdefghijklmnop"
+    };
+  </script>
+  
+  <!--
+    This HTML file is a template.
+    If you open it directly in the browser, you will see an empty page.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>SOUP Emprendimientos</title>
-  </head>
-  <body>
-    <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    You can add webfonts, meta tags, or analytics to this file.
+    The build step will place the bundled scripts into the <body> tag.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    To begin the development, run `npm start` or `yarn start`.
+    To create a production bundle, use `npm run build` or `yarn build`.
+  -->
+</body>
 </html>

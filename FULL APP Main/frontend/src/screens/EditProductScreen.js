@@ -13,11 +13,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
 import { PlusCircle, MinusCircle, Calculator, DollarSign, TrendingUp } from 'lucide-react'; // Iconos para añadir/eliminar insumos y cálculos
+import Breadcrumbs from '../components/Breadcrumbs';
+import { useNotification } from '../context/NotificationContext';
 
 const EditProductScreen = () => {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const { productId } = useParams(); // Obtener el ID del producto de la URL
+  const { showNotification } = useNotification();
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -247,8 +250,15 @@ const EditProductScreen = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar de navegación */}
+      {/* ... existing code ... */}
+      <main className="flex-1 max-w-4xl mx-auto w-full p-4 sm:p-8">
+        <Breadcrumbs items={[
+          { label: 'Dashboard', to: '/dashboard' },
+          { label: 'Productos', to: '/dashboard/products' },
+          { label: 'Editar Producto' }
+        ]} />
         <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Editar Producto/Servicio</CardTitle>
@@ -497,7 +507,7 @@ const EditProductScreen = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   );
 };

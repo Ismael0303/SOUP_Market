@@ -1,5 +1,7 @@
 # backend/app/routers/product_router.py
 
+from ..schemas import VentaCreate
+from fastapi import Query
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -9,7 +11,7 @@ from app.database import get_db
 from app.schemas import ProductoCreate, ProductoUpdate, ProductoResponse
 from app.crud import product as crud_product
 from app.dependencies import get_current_user
-from app.models import Usuario, UserTier
+from app.models import Usuario, UserTier, Negocio
 
 router = APIRouter(
     tags=["Products & Services"]
@@ -38,7 +40,7 @@ def create_product_endpoint(
             detail="Only micro-entrepreneurs and freelancers can create products/services."
         )
     # Validar propiedad del negocio
-    business = db.query(current_user.__class__).filter_by(id=product.negocio_id, propietario_id=current_user.id).first()
+    business = db.query(Negocio).filter_by(id=product.negocio_id, propietario_id=current_user.id).first()
     if not business:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -120,7 +122,7 @@ def update_product_endpoint(
             detail="Not authorized to update this product/service."
         )
     if product_update.negocio_id and product_update.negocio_id != db_product.negocio_id:
-        business = db.query(current_user.__class__).filter_by(id=product_update.negocio_id, propietario_id=current_user.id).first()
+        business = db.query(Negocio).filter_by(id=product_update.negocio_id, propietario_id=current_user.id).first()
         if not business:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -161,3 +163,143 @@ def delete_product_endpoint(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete product/service."
         )
+
+
+@router.post("/{product_id}/record_sale", response_model=dict)
+def record_product_sale(
+    product_id: UUID,
+    sale_data: VentaCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Registra una venta de producto y actualiza el inventario
+    
+    Args:
+        product_id: ID del producto a vender
+        sale_data: Datos de la venta (cantidad, precio, etc.)
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    
+    Returns:
+        dict: Información de la venta registrada
+    """
+    try:
+        # Verificar que el usuario tiene permisos para vender este producto
+        db_product = crud_product.get_product_by_id(db, product_id)
+        if not db_product:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        
+        if db_product.propietario_id != current_user.id:
+            raise HTTPException(status_code=403, detail="No autorizado para vender este producto")
+        
+        # Registrar la venta
+        venta_info = crud_product.record_sale(
+            db=db,
+            product_id=product_id,
+            quantity_sold=sale_data.quantity_sold,
+            user_id=current_user.id,
+            precio_unitario=sale_data.precio_unitario
+        )
+        
+        return {
+            "success": True,
+            "message": "Venta registrada exitosamente",
+            "venta_info": venta_info
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.put("/{product_id}/stock", response_model=ProductoResponse)
+def update_product_stock(
+    product_id: UUID,
+    stock_data: dict,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Actualiza el stock terminado de un producto
+    
+    Args:
+        product_id: ID del producto
+        stock_data: {"new_stock": float} - Nueva cantidad de stock
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    
+    Returns:
+        ProductoResponse: Producto actualizado
+    """
+    try:
+        new_stock = stock_data.get("new_stock")
+        if new_stock is None or new_stock < 0:
+            raise HTTPException(status_code=400, detail="new_stock debe ser un número positivo")
+        
+        db_product = crud_product.update_product_stock(
+            db=db,
+            product_id=product_id,
+            new_stock=new_stock,
+            user_id=current_user.id
+        )
+        
+        return db_product
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.get("/low_stock", response_model=List[ProductoResponse])
+def get_products_low_stock(
+    threshold: float = Query(5.0, description="Umbral de stock bajo"),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Obtiene productos con stock bajo
+    
+    Args:
+        threshold: Umbral de stock bajo (por defecto 5.0)
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    
+    Returns:
+        List[ProductoResponse]: Lista de productos con stock bajo
+    """
+    try:
+        productos = crud_product.get_products_low_stock(
+            db=db,
+            user_id=current_user.id,
+            threshold=threshold
+        )
+        return productos
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.get("/out_of_stock", response_model=List[ProductoResponse])
+def get_products_out_of_stock(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Obtiene productos sin stock
+    
+    Args:
+        db: Sesión de base de datos
+        current_user: Usuario autenticado
+    
+    Returns:
+        List[ProductoResponse]: Lista de productos sin stock
+    """
+    try:
+        productos = crud_product.get_products_out_of_stock(
+            db=db,
+            user_id=current_user.id
+        )
+        return productos
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")

@@ -27,6 +27,12 @@ cd C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Main
 npm start
 
 ..........................................................................................
+..........................................................................................
+Utilidades Copilot
+cd "C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Main"
+powershell -ExecutionPolicy Bypass .copilot\render_arquitectura_SOUP.cmd
+powershell -ExecutionPolicy Bypass -File .copilot\limpieza_backend.ps1
+
 
 ==========================================================================================
 Perfil de SOUP
@@ -42,3 +48,5 @@ http://127.0.0.1:8000/docs
 Repositorio GITHUB
 ==========================================================================================
 https://github.com/Ismael0303/SOUP_Market
+
+

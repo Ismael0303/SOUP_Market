@@ -1,121 +1,141 @@
 // frontend/src/screens/DashboardScreen.js
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card.jsx';
-import { Button } from '../components/ui/button.jsx';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Layout from '../components/Layout';
+import Breadcrumbs from '../components/Breadcrumbs';
 
-function DashboardScreen() {
-  const { user, loading, error, logout } = useAuth();
+const DashboardScreen = () => {
+  const [stats, setStats] = useState({
+    ventasHoy: 0,
+    ingresosHoy: '$0.00',
+    productosEnStock: 0,
+    totalNegocios: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Simular carga de datos del dashboard
+        setTimeout(() => {
+          setStats({
+            ventasHoy: 12,
+            ingresosHoy: '$1,250.00',
+            productosEnStock: 45,
+            totalNegocios: 3
+          });
+          setLoading(false);
+        }, 1000);
+        
+      } catch (err) {
+        console.error('Error cargando datos del dashboard:', err);
+        setError('Error al cargar los datos del dashboard');
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  // Datos de resumen con información real
+  const resumen = [
+    { 
+      label: 'Ventas Hoy', 
+      value: stats.ventasHoy, 
+      icon: '💸', 
+      color: 'bg-green-100 text-green-700' 
+    },
+    { 
+      label: 'Ingresos Hoy', 
+      value: stats.ingresosHoy, 
+      icon: '📈', 
+      color: 'bg-blue-100 text-blue-700' 
+    },
+    { 
+      label: 'Productos en Stock', 
+      value: stats.productosEnStock, 
+      icon: '📦', 
+      color: 'bg-yellow-100 text-yellow-700' 
+    },
+    { 
+      label: 'Negocios', 
+      value: stats.totalNegocios, 
+      icon: '🏪', 
+      color: 'bg-purple-100 text-purple-700' 
+    },
+  ];
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <p className="text-gray-800 dark:text-gray-200">Cargando dashboard...</p>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando datos del dashboard...</p>
+          </div>
+        </div>
+      </Layout>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <p className="text-red-600 text-center">Error: {error}. Por favor, <Link to="/login" className="text-blue-600 hover:underline">inicia sesión de nuevo</Link>.</p>
-      </div>
+      <Layout>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          <strong>Error:</strong> {error}
+        </div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Reintentar
+        </button>
+      </Layout>
     );
   }
-
-  if (!user) {
-    // Esto no debería pasar si la lógica de AuthContext redirige a login
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
-        <p className="text-red-600">No autenticado. Redirigiendo a login...</p>
-        <Link to="/login" className="text-blue-600 hover:underline ml-2">Ir a Login</Link>
-      </div>
-    );
-  }
-
-  // Variable para clarificar la lógica de roles. Un "provider" es quien ofrece negocios o servicios.
-  const isProvider = user.tipo_tier === 'microemprendimiento' || user.tipo_tier === 'freelancer';
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl mt-8">
-      <Card className="rounded-xl shadow-lg p-6 space-y-6">
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold text-center">Dashboard</CardTitle>
-          <CardDescription className="text-lg text-gray-600 dark:text-gray-400 text-center">
-            Bienvenido, {user.nombre} ({user.email})!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Sección de perfil rápido */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-2 text-blue-800 dark:text-blue-200">Tu Perfil</h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Tipo de cuenta: <span className="font-medium capitalize">{user.tipo_tier.replace('_', ' ')}</span>
-              </p>
-              {user.localizacion && <p className="text-gray-700 dark:text-gray-300">Ubicación: {user.localizacion}</p>}
-              {user.curriculum_vitae && (
-                <p className="text-gray-700 dark:text-gray-300">
-                  CV: <span className="font-medium">Disponible</span>
-                </p>
-              )}
-              <Link to="/profile">
-                <Button className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white">Ver/Editar Perfil</Button>
-              </Link>
-            </div>
-
-            {/* Sección de Acciones Rápidas */}
-            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-2 text-green-800 dark:text-green-200">Acciones Rápidas</h3>
-              <div className="space-y-2">
-                {/* Botón para Gestionar Negocios (visible para microemprendimiento y freelancer) */}
-                {isProvider && (
-                  <Link to="/dashboard/businesses" className="block">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Negocios</Button>
-                  </Link>
-                )}
-                {/* Botón para Gestionar Productos/Servicios (visible para microemprendimiento y freelancer) */}
-                {isProvider && (
-                  <Link to="/dashboard/products" className="block">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Productos/Servicios</Button>
-                  </Link>
-                )}
-                {/* Botón para Gestionar Insumos (visible para microemprendimiento y freelancer) */}
-                {isProvider && (
-                  <Link to="/dashboard/insumos" className="block">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Insumos</Button>
-                  </Link>
-                )}
-                <Link to="/my-encargos" className="block">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Ver Encargos</Button>
-                </Link>
-                <Link to="/my-clients-suppliers" className="block">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Gestionar Contactos</Button>
-                </Link>
-                <Link to="/reports" className="block">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">Ver Informes</Button>
-                </Link>
-              </div>
+    <Layout>
+      <Breadcrumbs items={[
+        { label: 'Dashboard' }
+      ]} />
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      {/* Cards de resumen */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        {resumen.map((item, idx) => (
+          <div key={idx} className={`rounded-2xl shadow-md p-6 flex items-center gap-4 ${item.color}`}>
+            <span className="text-3xl">{item.icon}</span>
+            <div>
+              <div className="text-2xl font-bold">{item.value}</div>
+              <div className="text-gray-600 text-sm font-medium">{item.label}</div>
             </div>
           </div>
-
-          {/* Sección de Novedades o Estadísticas Clave (a futuro) */}
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-            <h3 className="text-2xl font-semibold mb-4 text-text-dark dark:text-text-light">Novedades y Estadísticas</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Aquí se mostrarán tus estadísticas clave, nuevos encargos, y alertas importantes.
-              (Funcionalidad futura de la Fase 6).
-            </p>
+        ))}
+      </div>
+      {/* Acciones rápidas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Acciones Rápidas</h2>
+          <Link to="/dashboard/products/new" className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 px-6 font-semibold text-center">Crear Producto</Link>
+          <Link to="/dashboard/insumos/new" className="bg-green-600 hover:bg-green-700 text-white rounded-lg py-3 px-6 font-semibold text-center">Agregar Insumo</Link>
+          <Link to="/dashboard/businesses/new" className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg py-3 px-6 font-semibold text-center">Nuevo Negocio</Link>
+          <Link to="/dashboard/pos" className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg py-3 px-6 font-semibold text-center">Ir al POS</Link>
+        </div>
+        {/* Panel de bienvenida o ayuda */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-4 justify-center items-center">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">¡Bienvenido a SOUP!</h2>
+          <p className="text-gray-600 text-center">Gestiona tu negocio, productos, ventas e insumos desde un solo lugar. Usa las acciones rápidas para comenzar.</p>
+          <div className="w-40 h-40 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mt-4">
+            <span className="text-6xl">🏪</span>
           </div>
-
-          <Button onClick={logout} className="w-full bg-red-600 hover:bg-red-700 text-white mt-8">
-            Cerrar Sesión
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </Layout>
   );
-}
+};
 
 export default DashboardScreen;

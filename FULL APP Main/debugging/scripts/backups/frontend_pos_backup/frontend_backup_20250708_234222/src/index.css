@@ -1,0 +1,86 @@
+/* Importa las directivas de Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define las variables CSS para los colores de Shadcn UI */
+/* Estos valores de HSL (Hue, Saturation, Lightness) se usarán en tailwind.config.js */
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* Fondo blanco */
+    --foreground: 222.2 47.4% 11.2%; /* Texto oscuro */
+
+    --muted: 210 40% 96.1%; /* Fondo para elementos silenciados (ej. algunos inputs) */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Texto en elementos silenciados */
+
+    --popover: 0 0% 100%; /* Fondo de popovers */
+    --popover-foreground: 222.2 47.4% 11.2%; /* Texto en popovers */
+
+    --border: 214.3 31.8% 91.4%; /* Color de borde */
+    --input: 214.3 31.8% 91.4%; /* Color de borde de input */
+    --card: 0 0% 100%; /* Fondo de tarjetas */
+    --card-foreground: 222.2 47.4% 11.2%; /* Texto en tarjetas */
+
+    --primary: 222.2 47.4% 11.2%; /* Color primario (oscuro para texto) */
+    --primary-foreground: 210 40% 98%; /* Texto sobre primario (claro) */
+
+    --secondary: 210 40% 96.1%; /* Color secundario (fondo claro) */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Texto sobre secundario (oscuro) */
+
+    --accent: 210 40% 96.1%; /* Color de acento (fondo claro) */
+    --accent-foreground: 222.2 47.4% 11.2%; /* Texto sobre acento (oscuro) */
+
+    --destructive: 0 84.2% 60.2%; /* Color destructivo (rojo) */
+    --destructive-foreground: 210 40% 98%; /* Texto sobre destructivo (claro) */
+
+    --ring: 215 20.2% 65.1%; /* Color de anillo (focus) */
+
+    --radius: 0.5rem; /* Radio de borde por defecto para componentes */
+  }
+
+  /* Dark mode (opcional, si decides implementarlo después) */
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 40% 98%;
+
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.5%;
+
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 40% 98%;
+
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 217.9 10.6% 64.5%;
+  }
+}
+
+/* Establece el tamaño del cuerpo y la fuente Inter */
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

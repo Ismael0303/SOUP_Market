@@ -1,0 +1,43 @@
+# Archivos y carpetas a ignorar por Git
+
+# Node
+node_modules/
+build/
+dist/
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+venv/
+ENV/
+
+# VSCode
+.vscode/
+
+# Archivos temporales y de sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Archivos de configuración de Cursor y Copilot
+.cursor/
+.cursorrules
+.copilot/
+
+# Archivos de backup y temporales
+*~
+*.bak
+*.tmp
+
+# Archivos problemáticos por longitud de ruta
+Documentación/Roadmap/Actualizaciones a implementar/ROADMAP - Protocolo de Actualizaciones y Plugins & Plugins 'Actualización Panadería', 'Actualización Discográfica' & Módulo 'Amigos del Negocio'.txt 

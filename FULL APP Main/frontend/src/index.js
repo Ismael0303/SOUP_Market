@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import './index.css'; // Importa los estilos de Tailwind CSS
 import App from './App';
 // import reportWebVitals from './reportWebVitals'; // ELIMINAR O COMENTAR ESTA LÍNEA
@@ -9,7 +12,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 // Renderiza el componente principal <App /> dentro del modo estricto de React
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <NotificationProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </NotificationProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

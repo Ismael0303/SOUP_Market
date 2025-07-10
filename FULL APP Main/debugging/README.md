@@ -142,7 +142,15 @@ Para debugging automático basado en el historial:
 - **Mantener versiones** de scripts importantes
 - **Limpiar scripts obsoletos** periódicamente
 
+## 2024-07-08 - Corrección de error 422 en creación de productos
+
+- Se corrigió el formulario de creación de productos en el frontend para que el campo `tipo_producto` use los valores válidos del Enum del backend (`PHYSICAL_GOOD`, `SERVICE_BY_HOUR`, `SERVICE_BY_PROJECT`, `DIGITAL_GOOD`).
+- Esto soluciona el error 422 (Unprocessable Entity) que ocurría al enviar valores como `producto_digital` o `servicio` en minúsculas o en español.
+- Ahora el usuario ve las opciones en español, pero se envía el valor correcto al backend.
+
 ---
 
 **Última actualización:** 7 de Julio de 2025  
 **Organización:** Scripts organizados por categoría 
+
+- [Reporte de debugging: Resolución de errores de integridad en productos (2025-07-09)](reportes/debugging_integridad_productos_20250709.md) 
