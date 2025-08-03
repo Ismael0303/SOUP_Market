@@ -1,0 +1,135 @@
+PSEUDOCÓDIGO PARA MOCKUP INTERACTIVO DE UI/UX DE SOUP MARKET
+
+// Estructura General de la Aplicación
+APLICACIÓN SOUP_MARKET:
+    CONTENEDOR PRINCIPAL_GENERAL (Ancho completo, altura mínima de pantalla, fondo gris claro):
+        // Barra Lateral de Navegación (Simplificada para el Mockup)
+        SECCIÓN BARRA_LATERAL (Ancho fijo, fondo blanco, sombra, esquinas redondeadas):
+            ELEMENTO LOGO (Texto grande, negrita, color primario): "SOUP Market"
+            LISTA DE NAVEGACIÓN (Espaciado vertical):
+                ELEMENTO ENLACE (Texto, icono, resaltado para "Dashboard" como activo): "Dashboard"
+                ELEMENTO ENLACE (Texto, icono): "Productos"
+                ELEMENTO ENLACE (Texto, icono): "Ventas"
+                ELEMENTO ENLACE (Texto, icono): "Inventario"
+                ELEMENTO ENLACE (Texto, icono): "Reportes"
+                // ... (otros elementos de navegación genéricos con iconos placeholder)
+
+        // Área de Contenido Principal (Flexible, ocupa el espacio restante, padding)
+        SECCIÓN CONTENIDO_PRINCIPAL:
+            // Encabezado de la Página
+            SECCIÓN ENCABEZADO_PAGINA (Flex, espacio entre elementos, alineación vertical):
+                GRUPO TITULO_BREADCRUMB:
+                    TITULO H1 (Texto grande, negrita): "Crear Producto"
+                    ELEMENTO BREADCRUMB (Texto pequeño, color secundario): "Dashboard > Productos > Crear Producto"
+                CONTENEDOR ACCIONES_SUPERIORES (Flex, alineación vertical):
+                    CAMPO DE ENTRADA BUSCAR (Input de texto con borde redondeado, icono de lupa a la izquierda):
+                        PLACEHOLDER: "Buscar..."
+                    BOTÓN PERFIL_USUARIO (Circular, icono de avatar, texto de usuario):
+                        TEXTO: "Usuario"
+
+            // Área del Formulario de Creación de Producto
+            SECCIÓN FORMULARIO_PRODUCTO (Margen superior, diseño de tarjeta):
+                TARJETA FORMULARIO (Fondo blanco, padding, sombra, esquinas redondeadas):
+                    TITULO H2 (Texto mediano, negrita): "Detalles del Producto"
+                    FORMULARIO (Grid de columnas para organización de campos):
+                        // Grupo de Campos: Información Básica
+                        GRUPO CAMPOS_BASICOS (Grid 2 columnas, responsive a 1 columna en móvil):
+                            CAMPO DE ENTRADA TEXTO:
+                                ETIQUETA: "Nombre del producto"
+                                INPUT (Texto, borde redondeado, placeholder): "Introduce el nombre del producto"
+                                REQUERIDO: Sí (visualizar con asterisco o similar)
+                            CAMPO DE ENTRADA TEXTO:
+                                ETIQUETA: "SKU"
+                                INPUT (Texto, borde redondeado, placeholder): "Código único del producto"
+
+                        // Grupo de Campos: Precios y Stock
+                        GRUPO CAMPOS_PRECIO_STOCK (Grid 2 columnas, responsive a 1 columna en móvil):
+                            CAMPO DE ENTRADA NÚMERO:
+                                ETIQUETA: "Precio de Venta (ARS)"
+                                INPUT (Número, borde redondeado, placeholder): "Ej: 29.999"
+                                REQUERIDO: Sí
+                            CAMPO DE ENTRADA NÚMERO:
+                                ETIQUETA: "Costo de Compra (ARS)"
+                                INPUT (Número, borde redondeado, placeholder): "Ej: 15.000"
+                                REQUERIDO: Sí
+                            CAMPO DE ENTRADA NÚMERO:
+                                ETIQUETA: "Stock Actual"
+                                INPUT (Número, borde redondeado, placeholder): "Cantidad disponible"
+                                REQUERIDO: Sí
+                            CAMPO SELECT/DROPDOWN:
+                                ETIQUETA: "Estado"
+                                SELECT (Borde redondeado):
+                                    OPCIONES: "Activo", "Inactivo"
+                                    VALOR_POR_DEFECTO: "Activo"
+
+                        // Grupo de Campos: Categoría y Proveedor
+                        GRUPO CAMPOS_CATEGORIA_PROVEEDOR (Grid 2 columnas, responsive a 1 columna en móvil):
+                            CAMPO DE ENTRADA TEXTO:
+                                ETIQUETA: "Categoría"
+                                INPUT (Texto, borde redondeado, placeholder): "Ej: Bebidas, Panadería"
+                            CAMPO DE ENTRADA TEXTO:
+                                ETIQUETA: "Proveedor"
+                                INPUT (Texto, borde redondeado, placeholder): "Nombre del proveedor"
+
+                        // Campo: Área de Notas
+                        CAMPO TEXTAREA:
+                            ETIQUETA: "Área de notas"
+                            TEXTAREA (Borde redondeado, placeholder, altura fija): "Notas adicionales sobre el producto..."
+
+                        // Campo: Cargar Imagen
+                        CAMPO CARGA_IMAGEN:
+                            ETIQUETA: "Cargar Imagen"
+                            CONTENEDOR_INPUT_ARCHIVO (Flex, alineación):
+                                INPUT TIPO_FILE (Oculto, activado por botón):
+                                BOTÓN (Estilo secundario, texto): "Seleccionar Archivo"
+                                TEXTO_ARCHIVO_SELECCIONADO (Texto, color secundario): "Ningún archivo seleccionado"
+                            PREVISUALIZACIÓN_IMAGEN (Contenedor para imagen, borde punteado, texto central): "Previsualización de imagen"
+
+                        // Campo: Checkbox Producto Activo
+                        CAMPO CHECKBOX:
+                            INPUT CHECKBOX (Estilo por defecto):
+                            ETIQUETA: "Producto Activo"
+                            POR_DEFECTO_MARCADO: Sí
+
+                        // Botones de Acción
+                        CONTENEDOR BOTONES_ACCION (Flex, justificado al final, espaciado):
+                            BOTÓN CANCELAR:
+                                TEXTO: "Cancelar"
+                                ESTILO: Secundario (fondo gris, texto blanco, borde redondeado)
+                            BOTÓN CREAR_PRODUCTO:
+                                TEXTO: "Crear Producto"
+                                ESTILO: Primario (fondo azul/verde, texto blanco, borde redondeado)
+
+// Funcionalidad Interactiva para el Mockup (JavaScript):
+    AL CARGAR LA PÁGINA:
+        1. Inicializar todos los campos de entrada de texto y número como vacíos.
+        2. Asegurar que el `select` "Estado" tenga "Activo" seleccionado.
+        3. Asegurar que el checkbox "Producto Activo" esté marcado.
+
+    AL INTERACTUAR CON CAMPO_CARGA_IMAGEN (Input de tipo 'file'):
+        1. CUANDO SE SELECCIONA UN ARCHIVO:
+            a. Actualizar TEXTO_ARCHIVO_SELECCIONADO con el nombre del archivo.
+            b. SI ES UNA IMAGEN: Mostrar una previsualización de la imagen en PREVISUALIZACIÓN_IMAGEN.
+            c. SINO: Mostrar un mensaje como "Archivo no compatible" o solo el nombre.
+
+    AL HACER CLIC EN BOTÓN_CANCELAR:
+        1. PREVENIR COMPORTAMIENTO POR DEFECTO DEL FORMULARIO.
+        2. LIMPIAR FORMULARIO: Restablecer todos los campos a su estado inicial (vacío/por defecto).
+        3. MOSTRAR MENSAJE TEMPORAL (no alert): "Formulario de creación de producto cancelado." (Ej: un div que aparece y desaparece).
+
+    AL HACER CLIC EN BOTÓN_CREAR_PRODUCTO:
+        1. PREVENIR COMPORTAMIENTO POR DEFECTO DEL FORMULARIO.
+        2. VALIDAR CAMPOS_REQUERIDOS (Nombre del producto, Precio de Venta, Costo de Compra, Stock Actual):
+            a. SI algún campo requerido está vacío:
+                i. MOSTRAR MENSAJE_ERROR TEMPORAL (no alert): "Por favor, completa todos los campos obligatorios."
+                ii. RESALTAR visualmente los campos faltantes (ej: borde rojo).
+            b. SINO (todos los campos requeridos están llenos):
+                i. MOSTRAR MENSAJE_ÉXITO TEMPORAL (no alert): "Producto creado exitosamente."
+                ii. LIMPIAR FORMULARIO: Restablecer todos los campos a su estado inicial.
+
+// Consideraciones de Diseño y Estilo (Tailwind CSS):
+    - Utilizar clases de Tailwind para layout (flex, grid), espaciado (p, m, gap), tamaño (w, h), tipografía (text-*, font-*), colores (bg-*, text-*), sombras (shadow-*), bordes (rounded-*, border-*).
+    - Asegurar que el diseño sea responsivo utilizando prefijos de Tailwind (sm:, md:, lg:).
+    - Estilizar los botones con hover effects y bordes redondeados.
+    - Utilizar iconos de Lucide React o SVG inline para los elementos visuales (lupa, avatar, iconos de navegación).
+    - La sección de la barra lateral puede ser fija o colapsable en pantallas pequeñas. Para este mockup, mantenerla simple y visible en escritorio.

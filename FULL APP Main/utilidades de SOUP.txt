@@ -33,6 +33,23 @@ cd "C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Mai
 powershell -ExecutionPolicy Bypass .copilot\render_arquitectura_SOUP.cmd
 powershell -ExecutionPolicy Bypass -File .copilot\limpieza_backend.ps1
 
+==========================================================================================
+Docker y Shuup
+==========================================================================================
+
+directorio de shuup
+cd C:\Users\Ismael\shuup\shuup
+
+Crear instancia de shuup (completado)
+docker-compose build
+docker-compose up -d
+
+superuser
+http://localhost:8000/sa/wizard/
+usuario: root
+contraseña: ismael
+
+
 
 ==========================================================================================
 Perfil de SOUP

@@ -1,13 +1,13 @@
 // TODO: Integrar <Breadcrumbs /> y usar notificaciones globales en acciones clave.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db, getAppId } from '../firebaseConfig';
 import { getProductsWithStock, updateProductStock } from '../api/productApi';
 import { getMyBusinesses } from '../api/businessApi';
-import { createVenta } from '../api/ventaApi';
 import Layout from '../components/Layout';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useNotification } from '../context/NotificationContext';
-import { useAuth } from '../context/AuthContext';
 
 const POSScreen = () => {
   const [search, setSearch] = useState('');
@@ -22,7 +22,6 @@ const POSScreen = () => {
   const [businesses, setBusinesses] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo');
   const { showNotification } = useNotification();
-  const { user } = useAuth();
 
   useEffect(() => {
     // Reloj en tiempo real
@@ -109,7 +108,7 @@ const POSScreen = () => {
   };
 
   const finalizarVenta = async () => {
-    if (!user) {
+    if (!auth.currentUser) {
       showNotification('Debes estar autenticado para realizar ventas.', 'error');
       return;
     }
@@ -125,20 +124,20 @@ const POSScreen = () => {
     }
 
     try {
-      const userId = user.id;
-      const businessId = selectedBusiness.id;
+      const userId = auth.currentUser.uid;
+      const appId = getAppId();
 
       // Calcular totales
       const subtotal = cart.reduce((sum, item) => sum + (item.precio || 0) * item.qty, 0);
       const taxAmount = subtotal * 0.21; // 21% IVA
       const totalAmount = subtotal + taxAmount;
 
-      // Crear objeto de venta para enviar al backend
+      // Crear objeto de venta para Firestore
       const saleData = {
         userId: userId,
-        businessId: businessId,
+        businessId: selectedBusiness.id,
         receiptNumber: `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        saleDate: new Date().toISOString(), // Usar fecha actual
+        saleDate: serverTimestamp(),
         paymentMethod: selectedPaymentMethod,
         totalAmount: totalAmount,
         subtotalAmount: subtotal,
@@ -160,8 +159,9 @@ const POSScreen = () => {
         discountReason: ""
       };
 
-      // Guardar venta en el backend
-      const newSale = await createVenta(saleData);
+      // Guardar venta en Firestore
+      const salesCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/sales`);
+      await addDoc(salesCollectionRef, saleData);
 
       // Actualizar stock de productos vendidos
       for (const item of cart) {

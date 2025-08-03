@@ -1,9 +1,29 @@
 # 🗺️ ROADMAP DEFINITIVO DE SOUP MARKET (MVP)
 
-**Versión:** 1.0  
-**Fecha:** 7 de Julio de 2025  
-**Objetivo:** MVP Online a Finales de Septiembre 2025  
-**Estado:** En Desarrollo
+> **ACTUALIZACIÓN IMPORTANTE (Agosto 2025):**
+> 
+> Se ha decidido migrar la lógica de marketplace y gestión de productos/negocios a Shuup (ERP open source). El backend FastAPI actuará como gateway/orquestador y el frontend React se adaptará para consumir los nuevos endpoints. Esto implica cambios en la arquitectura, mapeo de modelos y migración de datos. Ver detalles en `Documentación/Migracion Shuup/`.
+> 
+> **Implicancias:**
+> - Varias funcionalidades de backend (CRUD de productos, negocios, encargos, reviews, etc.) pasarán a gestionarse vía la API de Shuup.
+> - El sistema de autenticación y lógica de insumos/productos propios de SOUP se mantendrá solo donde Shuup no cubra la funcionalidad.
+> - El cronograma y los capítulos de este roadmap han sido adaptados para reflejar la nueva arquitectura.
+
+---
+
+## OBJETIVOS OBSOLETOS Y SUSTITUCIONES POR MIGRACIÓN A SHUUP
+
+| Objetivo/Tarea Obsoleta (SOUP Nativo) | Nuevo Objetivo (Con Shuup) |
+|---------------------------------------|----------------------------|
+| Modelos y migraciones de BD para: Producto, Negocio, Encargo, Review, Publicidad, etc. | Mapeo y migración de datos a modelos equivalentes de Shuup. |
+| CRUD de productos, negocios, encargos, reviews, publicidad en FastAPI | Integración de FastAPI como gateway a la API de Shuup para estas entidades. |
+| Routers y lógica de negocio propia para marketplace en FastAPI | Adaptación de endpoints FastAPI para orquestar y transformar datos entre frontend y Shuup. |
+| Migraciones y scripts de actualización de BD para entidades marketplace | Scripts de migración de datos y sincronización con Shuup. |
+| Implementación de lógica de marketplace (stock, ventas, pedidos, reviews, etc.) en SOUP | Uso de lógica y flujos nativos de Shuup para marketplace, ventas, pedidos, reviews, etc. |
+| Desarrollo de paneles de administración propios para marketplace | Adaptación de UI/UX para consumir y mostrar datos provenientes de Shuup. |
+| Pruebas unitarias/integración de lógica CRUD marketplace en SOUP | Pruebas de integración y validación de la comunicación FastAPI ↔ Shuup ↔ Frontend. |
+
+> **Nota:** La gestión de insumos, recetas y lógica específica de panadería se mantiene en SOUP si Shuup no cubre esa funcionalidad.
 
 ---
 
@@ -146,7 +166,7 @@ frontend/src/
 
 ## 3. NUEVAS FUNCIONALIDADES A IMPLEMENTAR (POR CAPÍTULOS)
 
-Continuaremos con el desarrollo incremental, añadiendo valor en cada etapa.
+> **NOTA:** A partir de la migración a Shuup, las siguientes funcionalidades se implementarán adaptando el frontend y backend para interactuar con Shuup. Las tareas de CRUD y lógica de negocio que ahora dependen de Shuup están marcadas como [MIGRACIÓN SHUUP].
 
 ### **Capítulo ACTUAL: Workflow Interno y Gestión de Ventas en Local (Panadería Ñiam)**
 
@@ -623,3 +643,11 @@ Este roadmap es un plan de alto nivel. Durante el desarrollo, pueden surgir desa
 **Última actualización:** 7 de Julio de 2025  
 **Versión del documento:** 1.0  
 **Mantenedor:** Equipo SOUP Emprendimientos 
+
+---
+
+## NUEVA SECCIÓN: PLAN DE MIGRACIÓN A SHUUP
+
+Ver `Documentación/Migracion Shuup/PLANTILLA_PLAN_MIGRACION.md` para el plan detallado de migración, mapeo de modelos y registro de decisiones técnicas.
+
+--- 
