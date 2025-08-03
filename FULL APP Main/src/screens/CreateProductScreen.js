@@ -81,7 +81,7 @@ const CreateProductScreen = () => {
 
   // Unidades de venta
   const units = [
-    'unidad', 'kg', 'litro', 'metro', 'hora', 'sesion'
+    'unidad', 'kg', 'litro', 'metro', 'hora', 'sesión'
   ];
 
   useEffect(() => {
