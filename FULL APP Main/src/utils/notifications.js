@@ -42,14 +42,21 @@ const NotificationContainer = () => {
   const addNotification = (message, type = 'info', duration = 5000) => {
     const id = Date.now() + Math.random();
     const newNotification = { id, message, type, duration };
-    
+
     setNotifications(prev => [...prev, newNotification]);
-    
+    if (!window.notificationIds) {
+      window.notificationIds = new Set();
+    }
+    window.notificationIds.add(id);
+
     return id;
   };
 
   const removeNotification = (id) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
+    if (window.notificationIds) {
+      window.notificationIds.delete(id);
+    }
   };
 
   // Exponer métodos globalmente
@@ -79,6 +86,9 @@ export const initializeNotifications = () => {
   const container = document.createElement('div');
   container.id = 'notification-container';
   document.body.appendChild(container);
+
+  // Inicializar almacenamiento de IDs
+  window.notificationIds = new Set();
 
   // Renderizar el componente
   notificationRoot = createRoot(container);
@@ -112,11 +122,8 @@ export const showWarning = (message, duration = 5000) => {
 
 // Limpiar notificaciones
 export const clearNotifications = () => {
-  if (window.removeNotification) {
-    // Esto limpiará todas las notificaciones activas
-    const notifications = document.querySelectorAll('#notification-container > div > div');
-    notifications.forEach((_, index) => {
-      window.removeNotification(index);
-    });
+  if (window.notificationIds && window.removeNotification) {
+    [...window.notificationIds].forEach(id => window.removeNotification(id));
+    window.notificationIds.clear();
   }
-}; 
+};
