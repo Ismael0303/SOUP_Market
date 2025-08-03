@@ -1,0 +1,33 @@
+{
+  "fecha_creacion": "2025-07-10T00:07:22.509847",
+  "directorio_origen": "C:\\Users\\Ismael\\Desktop\\PROYECTO SOHA\\SOUP\\SOUP Emprendimientos\\FULL APP Main\\frontend",
+  "directorio_backup": "C:\\Users\\Ismael\\Desktop\\PROYECTO SOHA\\SOUP\\SOUP Emprendimientos\\FULL APP Main\\frontend_backup_optimizado_20250710_000703",
+  "estadisticas": {
+    "archivos_copiados": 44,
+    "archivos_excluidos": 43147,
+    "carpetas_excluidas": 4719
+  },
+  "exclusiones": [
+    "node_modules/",
+    ".git/",
+    "build/",
+    "dist/",
+    ".cache/",
+    "coverage/",
+    ".nyc_output/",
+    "*.log",
+    "*.tmp",
+    "*.temp",
+    ".DS_Store",
+    "Thumbs.db",
+    ".env.local",
+    ".env.development.local",
+    ".env.test.local",
+    ".env.production.local"
+  ],
+  "notas": [
+    "Este backup excluye archivos que se pueden regenerar automáticamente",
+    "Para restaurar: copiar contenido y ejecutar 'npm install'",
+    "node_modules se regenerará automáticamente con npm install"
+  ]
+}

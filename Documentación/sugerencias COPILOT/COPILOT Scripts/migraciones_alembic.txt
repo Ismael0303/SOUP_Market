@@ -1,0 +1,20 @@
+# Script: Ejemplo de configuración de Alembic para migraciones automáticas
+
+"""
+Este script es un ejemplo de cómo inicializar Alembic y configurar migraciones automáticas.
+Ejecuta estos comandos en la terminal desde la raíz del backend:
+
+1. Instala Alembic:
+   pip install alembic
+
+2. Inicializa Alembic:
+   alembic init migrations
+
+3. Edita alembic.ini y env.py para apuntar a tu DATABASE_URL y modelos.
+
+4. Crea una migración:
+   alembic revision --autogenerate -m "Initial migration"
+
+5. Aplica la migración:
+   alembic upgrade head
+"""

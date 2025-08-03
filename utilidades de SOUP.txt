@@ -1,0 +1,69 @@
+==========================================================================================
+POSTGRESQL
+==========================================================================================
+psql -U postgres -h localhost -p 5432
+usuario: postgres
+contraseña: password123
+
+psql -U soupuser -d soup_app_db -h localhost -p 5432
+usuario: soupuser
+contraseña: souppass
+
+CREATE DATABASE soup_app_db;
+
+==========================================================================================
+Simbolo del Sistema (CMD)
+==========================================================================================
+
+..........................................................................................
+Iniciar backend
+cd C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Main\backend
+.\venv\Scripts\activate
+uvicorn app.main:app --reload
+
+..........................................................................................
+Iniciar frontend
+cd C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Main\frontend
+npm start
+
+..........................................................................................
+..........................................................................................
+Utilidades Copilot
+cd "C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\FULL APP Main"
+powershell -ExecutionPolicy Bypass .copilot\render_arquitectura_SOUP.cmd
+powershell -ExecutionPolicy Bypass -File .copilot\limpieza_backend.ps1
+
+==========================================================================================
+Docker y Shuup
+==========================================================================================
+
+directorio de shuup
+cd C:\Users\Ismael\shuup\shuup
+
+Crear instancia de shuup (completado)
+docker-compose build
+docker-compose up -d
+
+superuser
+http://localhost:8000/sa/wizard/
+usuario: root
+contraseña: ismael
+
+
+
+==========================================================================================
+Perfil de SOUP
+==========================================================================================
+http://localhost:3000/login
+Usuario:ismaeldimenza@hotmail.com
+Constraseña:ismael38772433
+
+Swagger UI backend API
+http://127.0.0.1:8000/docs
+
+==========================================================================================
+Repositorio GITHUB
+==========================================================================================
+https://github.com/Ismael0303/SOUP_Market
+
+

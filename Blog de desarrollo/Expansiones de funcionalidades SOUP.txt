@@ -1,0 +1,41 @@
+SOUP News
+. El objeto informatico central pasa del Producto/Servicio al "blog post"
+. Los negocios pasan a ser "editoriales"
+. Los usuarios pueden sucrbirse a editoriales, de modo que le lleguen los posts de dicha editorial
+. Los blog post actuarian como noticias amateurs (fecha, tema, ubicacion, autor)
+. Las noticias podrian georeferenciarse, compartirse, descargarse, etc
+
+SOUP Projects
+. El usuario premium puede crear "proyectos". Los proyectos son procesos productivos de cualquier tipo
+. Implican objetivos, requerimientos, plazos y colaboradores
+. Los usuarios gratuitos pueden unirse como colaboradores
+. La plataforma ofrece creacion de tareas y cronogramas, seguimiento, comunicaciones y una base de datos colaborativa para todo el grupo del proyecto
+
+SOUP Identity
+. Cada una usuario tiene un perfil de información publica
+. Incluye identificacion oficial como Nombre, DNI, Ciudad/Pais
+. Se puede adjuntar cualquier tipo de informacion personal extra que el usuario desee:
+	. Telefonos de contacto personales y de familiares
+	. CV, perfil de SOUP, redes sociales
+	. Seguros (de vida, de vehiculo, etc.)
+	. Historial medico
+. Toda la informacion de guardaría localmente, y si el usuario desea, que pueda buscarse publicamente
+. El objetivo seria podeer acceder a informacion vital del individuo en casos de emergencias (urgencias medicas, accidentes, extravios, etc.)
+. El usuario compartiría su perfil publico segun lo requiera (a la policia, a un SOS, etc.)
+. El directorio publico serviría en casos donde el usuario esta inhabilitado (inconciente)
+
+SOUP Localicer
+. Permite a los usuarios compartir su ubicación exacta con sus contactos
+. Puede compartirse en una plataforma publica si se desea
+. Tiene una funcion multiple:
+	. Publicidad (Estoy tocando en vivo aqui)
+	. Relaciones (Estoy de vacaciones cerca de tu casa)
+	. Emergencias (Choque mi auto y estoy varado aqui)
+
+SOUP Requests
+. La version de SOUP Market del lado del cliente
+. Además de poder navegar el directorio de negocios, el usuario puede solicitar un encargo personalizado (ej: necesito una landing page para mi empresa)
+. La solicitud se vuelve publica con todos los requerimientos
+. Los freelancers/emprendedores pueden ver estas solcitudes y postularse con un precio personalizado
+. Varios emprendedores pueden postularse al mismo encargo
+. El usuario solicitante elige a quien le deriva el encargo segun le convenga

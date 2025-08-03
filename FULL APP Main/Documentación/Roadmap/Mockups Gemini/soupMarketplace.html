@@ -1,0 +1,354 @@
+<!--
+C:\Users\Ismael\Desktop\PROYECTO SOHA\SOUP\SOUP Emprendimientos\Diseño Web\Mockups Gemini
+soupMarketplace.html
+Mockup Interactivo de Pantalla Marketplace Público de SOUP Market
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOUP Market - Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light gray background */
+            color: #343a40; /* Dark text */
+        }
+        .header-marketplace {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 1rem;
+        }
+        .search-bar-container {
+            flex-grow: 1; /* Allows search bar to take available space */
+            max-width: 600px; /* Max width for search bar */
+        }
+        .input-field {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .btn-primary {
+            background-color: #007bff; /* Blue */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .btn-secondary {
+            background-color: #6c757d; /* Gray */
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268; /* Darker gray on hover */
+        }
+        .sidebar-filters {
+            width: 250px;
+            background-color: #ffffff;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            flex-shrink: 0;
+        }
+        .product-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .product-image {
+            width: 100%;
+            height: 180px; /* Fixed height for consistent image size */
+            object-fit: cover; /* Cover the area, cropping if necessary */
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .message-box {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            display: none; /* Oculto por defecto */
+            text-align: center;
+        }
+        .message-box.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-box.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-marketplace {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .search-bar-container {
+                width: 100%;
+                max-width: none;
+            }
+            .header-marketplace > div:last-child { /* User actions */
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .main-content-marketplace {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .sidebar-filters {
+                width: 100%;
+                margin-bottom: 2rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjust for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Encabezado del Marketplace -->
+    <header class="header-marketplace">
+        <div class="text-3xl font-bold text-blue-600">SOUP Market</div>
+        <div class="search-bar-container relative">
+            <input type="text" placeholder="Buscar productos..." class="input-field pl-10 pr-4 py-2">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="flex items-center text-gray-700 hover:text-blue-600 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span class="ml-1 hidden md:inline">Carrito</span>
+            </button>
+            <button class="flex items-center bg-gray-200 text-gray-700 py-2 px-4 rounded-full hover:bg-gray-300 transition-colors">
+                <svg class="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Usuario
+            </button>
+        </div>
+    </header>
+
+    <!-- Mensajes de feedback (ocultos por defecto) -->
+    <div id="messageBox" class="message-box mx-auto max-w-4xl mt-4" style="display: none;"></div>
+
+    <!-- Área de Contenido Principal del Marketplace -->
+    <main class="flex flex-col md:flex-row flex-grow p-4 md:p-8 gap-8 main-content-marketplace">
+        <!-- Barra Lateral de Filtros -->
+        <aside class="sidebar-filters">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Filtros</h3>
+
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-gray-700 mb-3">Categorías</h4>
+                <ul id="categoryList">
+                    <li class="mb-2"><a href="#" class="block text-blue-600 font-medium hover:underline category-link" data-category="all">Todos los Productos</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="panaderia">Panadería</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="discograficas">Discográficas</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="servicios">Servicios</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="tecnologia">Tecnología</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="artesania">Artesanía</a></li>
+                    <li class="mb-2"><a href="#" class="block text-gray-700 hover:text-blue-600 category-link" data-category="moda">Moda</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-semibold text-gray-700 mb-3">Rango de Precio (ARS)</h4>
+                <div class="flex gap-2 mb-4">
+                    <input type="number" placeholder="Mín." class="input-field w-1/2" id="minPrice">
+                    <input type="number" placeholder="Máx." class="input-field w-1/2" id="maxPrice">
+                </div>
+                <button class="btn-secondary w-full" id="applyFilterBtn">Aplicar</button>
+            </div>
+        </aside>
+
+        <!-- Área de Visualización de Productos -->
+        <section class="flex-grow">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 product-grid">
+                <!-- Product Card 1 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/007bff/ffffff?text=Producto+1" alt="Imagen del Producto 1" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Pan Artesanal SOUP</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$1.500 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Pan fresco, hecho a mano con ingredientes de calidad. Ideal para el desayuno o la merienda.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Pan Artesanal SOUP">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/6c757d/ffffff?text=Producto+2" alt="Imagen del Producto 2" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Software de Contabilidad</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$29.999 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Solución completa para la gestión financiera de tu microemprendimiento. Facturación, reportes y más.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Software de Contabilidad">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 3 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/28a745/ffffff?text=Producto+3" alt="Imagen del Producto 3" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Servicio de Diseño Gráfico</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$12.000 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Diseño de logos, branding y material publicitario para tu marca. ¡Destaca en el mercado!</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Servicio de Diseño Gráfico">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 4 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/ffc107/343a40?text=Producto+4" alt="Imagen del Producto 4" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Vinilo de Música Indie</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$8.500 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Edición limitada del nuevo álbum de "Los Sonidos Ocultos". ¡Coleccionable!</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Vinilo de Música Indie">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 5 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/17a2b8/ffffff?text=Producto+5" alt="Imagen del Producto 5" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Consultoría SEO Express</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$18.000 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Optimiza tu presencia online con una consultoría rápida y efectiva para mejorar tu posicionamiento.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Consultoría SEO Express">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 6 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/dc3545/ffffff?text=Producto+6" alt="Imagen del Producto 6" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Taller de Repostería Online</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$7.000 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Aprende a crear postres deliciosos desde casa con este taller interactivo.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Taller de Repostería Online">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 7 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/007bff/ffffff?text=Producto+7" alt="Imagen del Producto 7" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">E-book "Finanzas para Freelancers"</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$3.500 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Guía práctica para gestionar tus finanzas como trabajador independiente en Argentina.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="E-book Finanzas para Freelancers">Ver Detalles</button>
+                </div>
+
+                <!-- Product Card 8 -->
+                <div class="product-card">
+                    <img src="https://placehold.co/400x250/6c757d/ffffff?text=Producto+8" alt="Imagen del Producto 8" class="product-image">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Servicio de Edición de Audio</h3>
+                    <p class="text-2xl font-bold text-blue-600 mb-3">$9.500 ARS</p>
+                    <p class="text-sm text-gray-600 flex-grow mb-4">Edición profesional de podcasts, música y grabaciones. Calidad de estudio a tu alcance.</p>
+                    <button class="btn-primary view-details-btn" data-product-name="Servicio de Edición de Audio">Ver Detalles</button>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-gray-800 text-white py-6 text-center text-sm mt-auto">
+        <p>&copy; 2025 SOUP Market. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Get elements
+        const messageBox = document.getElementById('messageBox');
+        const categoryLinks = document.querySelectorAll('.category-link');
+        const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+
+        // Function to display messages
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}`; // Reset classes and add new type
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
+        }
+
+        // Event listener for category links
+        categoryLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
+
+                // Remove active class from all links
+                categoryLinks.forEach(l => l.classList.remove('text-blue-600', 'font-medium', 'underline'));
+                categoryLinks.forEach(l => l.classList.add('text-gray-700', 'hover:text-blue-600'));
+
+                // Add active class to clicked link
+                link.classList.add('text-blue-600', 'font-medium', 'underline');
+                link.classList.remove('text-gray-700', 'hover:text-blue-600');
+
+                const category = link.dataset.category;
+                showMessage(`Categoría seleccionada: "${category === 'all' ? 'Todos los Productos' : category.charAt(0).toUpperCase() + category.slice(1)}"`, 'info');
+                // In a real app, you would trigger a filter here
+            });
+        });
+
+        // Event listener for "Ver Detalles" buttons
+        viewDetailsButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default button behavior
+                const productName = button.dataset.productName;
+                showMessage(`Redirigiendo a detalles de "${productName}"...`, 'info');
+                // In a real app, this would navigate to a product detail page
+            });
+        });
+
+        // Event listener for "Aplicar" filter button
+        applyFilterBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+            let filterMessage = 'Filtros aplicados: ';
+            if (minPrice) {
+                filterMessage += `Mínimo $${minPrice} ARS. `;
+            }
+            if (maxPrice) {
+                filterMessage += `Máximo $${maxPrice} ARS.`;
+            }
+            if (!minPrice && !maxPrice) {
+                filterMessage = 'No se aplicaron filtros de precio.';
+            }
+            showMessage(filterMessage, 'info');
+            // In a real app, you would apply the price range filter here
+        });
+
+        // Initialize state on load
+        window.onload = () => {
+            // Ensure "Todos los Productos" is highlighted initially
+            const allProductsLink = document.querySelector('.category-link[data-category="all"]');
+            if (allProductsLink) {
+                allProductsLink.classList.add('text-blue-600', 'font-medium', 'underline');
+                allProductsLink.classList.remove('text-gray-700', 'hover:text-blue-600');
+            }
+        };
+    </script>
+</body>
+</html>

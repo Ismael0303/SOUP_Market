@@ -1,0 +1,187 @@
+Workflow Interno - Panadería Ñiam 
+Negocio: Panadería Ñiam (Tienda Física - Especialidad: Chipá) 
+Objetivo: Transicionar de Excel a SOUP Market como el sistema principal para la gestión de 
+ventas en el local, inventario, producción y finanzas, optimizando la operación diaria y la 
+rentabilidad del Chipá. 
+Visión General 
+"Panadería Ñiam" se enfoca en ofrecer una experiencia de compra excepcional en su 
+local físico, con el Chipá como su producto estrella. SOUP Market se implementará 
+como el Punto de Venta (POS) interno para registrar todas las transacciones, 
+gestionar el inventario en tiempo real y proporcionar a los dueños una visión 
+financiera completa, reemplazando la gestión manual con Excel. Los pedidos online 
+serán un canal secundario, pero también gestionado por SOUP. 
+Roles y Responsabilidades con SOUP 
+1.    
+Trabajador de Atención al Cliente (Usa SOUP Dashboard - Punto de Venta 
+Principal) 
+Funciones Clave: 
+● Gestión de Ventas en Local (SOUP: ManageProductsScreen / Nuevo Módulo 
+POS - Funcionalidad Futura): 
+○ Registro de Ventas: Cada vez que un cliente compra en el local, el 
+trabajador utilizará SOUP para seleccionar los productos (ej., "Chipá Clásico", 
+"Pan de Masa Madre", "Facturas"). 
+○ Cantidades y Precios: Ingresar las cantidades vendidas. SOUP mostrará 
+automáticamente el precio_venta de cada producto. 
+○ Cierre de Venta: Confirmar la transacción en SOUP. Esto automáticamente 
+descontará los productos del inventario y registrará la venta en los 
+reportes financieros. 
+○ Reemplazo de Excel: Esta es la función más crítica, SOUP sustituye 
+completamente la hoja de cálculo de ventas diaria. 
+● Consulta de Inventario de Productos: 
+○ Utilizar la pantalla Gestionar Productos/Servicios (ManageProductsScreen) 
+para verificar rápidamente la disponibilidad de productos terminados antes 
+de la venta o para informar al cliente. 
+● Recepción y Gestión de Pedidos Online (Módulo Encargos - Funcionalidad 
+Futura): 
+○ Recibir notificaciones de nuevos pedidos online realizados a través de SOUP. 
+○ Acceder a la pantalla de Gestión de Encargos en el Dashboard de SOUP. 
+○ Confirmar la recepción del pedido online, verificar la disponibilidad y 
+actualizar su estado. 
+● Facturación y Cobro (Integración con Ventas - Funcionalidad Futura): 
+○ SOUP registrará la venta. El proceso de cobro físico (efectivo, tarjeta) se 
+realizará con el POS de la panadería, pero la transacción se reflejará en 
+SOUP. 
+2.    
+Cocinero / Productor de Insumos (Usa SOUP Dashboard) 
+Funciones Clave: 
+● Gestión de Insumos (SOUP: ManageInsumosScreen, CreateInsumoScreen, 
+EditInsumoScreen): 
+○ Verificar Stock: Consultar cantidad_disponible de insumos (especialmente 
+para el Chipá: almidón de mandioca, queso, huevos, etc.) para planificar la 
+producción y reabastecimiento. 
+○ Registrar Compras: Actualizar la cantidad_disponible y 
+costo_unitario_compra cuando se adquieren nuevos insumos. 
+○ Añadir Nuevos Insumos: Registrar nuevos ingredientes o materiales. 
+● Gestión de Productos (SOUP: ManageProductsScreen, 
+CreateProductScreen, EditProductScreen): 
+○ Definir Recetas (para Chipá y otros productos): Al crear o editar un 
+producto, asociar los insumos necesarios y sus cantidad_necesaria para 
+producir una unidad (ej., "Chipá Clásico" requiere X gr de almidón, Y gr de 
+queso, Z huevos). 
+○ Ver Costos de Producción (COGS): Consultar el COGS (Costo de Bienes 
+Vendidos) calculado automáticamente por SOUP para cada producto, crucial 
+para el Chipá. 
+○ Ajustar Precios y Márgenes: 
+■ Introducir el precio_venta deseado para un producto. 
+■ Introducir un margen_ganancia_sugerido para que SOUP calcule un 
+precio_sugerido. 
+■ Ver el margen_ganancia_real calculado por SOUP para evaluar la 
+rentabilidad de cada producto, permitiendo optimizar el precio del Chipá. 
+● Planificación de Producción: 
+○ Basarse en el historial de ventas del local (datos de SOUP) y los pedidos 
+online para determinar qué y cuánto producir. 
+○ Utilizar el COGS para priorizar la producción de ítems más rentables y 
+asegurar la disponibilidad del Chipá. 
+3.   Dueños / Managers (Usa SOUP Dashboard - Análisis Financiero y Estratégico) 
+Funciones Clave: 
+● Visión General del Negocio (SOUP: DashboardScreen, 
+ManageBusinessesScreen): 
+○ Monitorear métricas clave como ventas_completadas (total de transacciones 
+en local y online), volumen de ventas, calificacion_promedio del negocio y 
+productos. 
+○ Ver el estado general de los negocios asociados. 
+● Gestión Financiera (Módulo de Reportes - Funcionalidad Futura): 
+○ Seguimiento de Ingresos: Acceder a reportes de ventas generados por 
+SOUP, desglosados por producto (ej., ventas de Chipá vs. otros productos), 
+período o canal (local vs. online). Esto reemplaza el seguimiento de 
+ingresos en Excel. 
+○ Seguimiento de Egresos: 
+■ Ver el costo total de insumos consumidos en un período (basado en 
+COGS y ventas). 
+■ (La gestión de sueldos y otros gastos fijos se haría externamente, pero 
+los datos de SOUP sobre ventas y costos de insumos serían cruciales 
+para el análisis de rentabilidad general). 
+○ Análisis de Rentabilidad: Utilizar los COGS, precio_sugerido y 
+margen_ganancia_real para tomar decisiones estratégicas sobre precios, 
+promociones y optimización de costos, especialmente para el Chipá. 
+● Gestión de Usuarios y Roles (Módulo de Administración - Funcionalidad 
+Futura): 
+○ Asignar y gestionar los roles de los empleados (Atención al Cliente, Cocinero) 
+dentro de la plataforma SOUP para controlar sus permisos de acceso. 
+● Optimización de Operaciones: 
+○ Identificar productos de alta demanda o alta rentabilidad. 
+○ Detectar insumos con altos costos o baja disponibilidad para buscar 
+alternativas. 
+○ Evaluar la satisfacción del cliente a través de las calificaciones (si se 
+implementa el feedback de clientes en local). 
+4.   Cliente (Interacción Principalmente Física / Opcional Online) 
+Funciones Clave: 
+● Compra en Local Físico: El cliente llega a la panadería, selecciona sus 
+productos (principalmente Chipá), y el Trabajador de Atención al Cliente 
+registra la venta en SOUP. 
+● Exploración de Productos Online (Secundario): Puede navegar por el 
+Directorio Público de SOUP (PublicListingScreen) para ver el menú de 
+"Panadería Ñiam" antes de visitar el local o para realizar un pedido online. 
+● Realización de Pedidos Online (Módulo Encargos - Funcionalidad Futura - 
+Opcional): 
+○ Seleccionar productos de "Panadería Ñiam" directamente desde SOUP. 
+○ Elegir método de entrega: Retiro en Tienda o Envío a Domicilio (vía 
+cadete). 
+● Seguimiento de Pedidos Online (Módulo Encargos - Funcionalidad Futura - 
+Opcional): 
+○ Ver el estado de su pedido online en tiempo real. 
+● Calificación y Reseñas (Módulo de Calificaciones - Funcionalidad Futura): 
+○ Calificar los productos y la experiencia con "Panadería Ñiam" después de 
+completar un pedido (online o, idealmente, con un QR en el local para 
+feedback físico). 
+Flujo de Trabajo Paso a Paso: Ejemplo de Venta en Local 
+(Prioritario) 
+Este ejemplo ilustra cómo una venta de "Chipá Clásico" se procesaría en el local a 
+través de SOUP: 
+1. Llegada del Cliente (Físico): 
+○ Un cliente entra a "Panadería Ñiam" y elige 5 unidades de "Chipá Clásico" y 1 
+"Pan de Masa Madre". 
+2. Registro de Venta (Atención al Cliente - USANDO SOUP): 
+○ El Trabajador de Atención al Cliente abre el módulo de ventas de SOUP (o 
+la pantalla ManageProductsScreen con una interfaz de venta simplificada). 
+○ Busca "Chipá Clásico", selecciona 5 unidades. 
+○ Busca "Pan de Masa Madre", selecciona 1 unidad. 
+○ SOUP muestra el total a pagar. 
+○ El trabajador procesa el cobro (fuera de SOUP, con el POS físico). 
+○ El trabajador hace clic en "Completar Venta" en SOUP. 
+○ SOUP automáticamente descuenta 5 Chipás y 1 Pan de Masa Madre del 
+inventario de productos terminados. 
+○ SOUP registra la venta en los reportes de ingresos. 
+3. Impacto en Insumos (Automático por SOUP): 
+○ Dado que "Chipá Clásico" y "Pan de Masa Madre" tienen insumos asociados 
+en SOUP (definidos por el Cocinero), la venta de estos productos 
+automáticamente reduce la cantidad disponible de los insumos 
+correspondientes (ej., almidón de mandioca, queso, harina). 
+4. Monitoreo de Inventario (Cocinero): 
+○ El Cocinero revisa la pantalla Gestionar Insumos (ManageInsumosScreen). 
+○ Observa que la cantidad_disponible de los insumos clave para Chipá ha 
+disminuido y decide que es momento de iniciar una nueva tanda de 
+producción. 
+5. Planificación de Producción (Cocinero): 
+○ El Cocinero revisa el COGS del "Chipá Clásico" en Gestionar 
+Productos/Servicios (ManageProductsScreen) para asegurar que la 
+producción sigue siendo rentable. 
+○ Procede a hornear más Chipá. 
+6. Análisis de Rendimiento (Dueños / Managers): 
+○ Los Dueños/Managers acceden al Dashboard para ver el volumen de 
+ventas actualizado en tiempo real. 
+○ Consultan los Reportes Financieros (futuro) para analizar la rentabilidad 
+diaria/semanal, enfocándose en las ventas de Chipá y sus márgenes de 
+ganancia reales. 
+○ Identifican los horarios pico de venta de Chipá para optimizar la producción y 
+el personal. 
+Beneficios de SOUP para Panadería Ñiam (Priorizando Venta en 
+Local) 
+● Adiós a Excel en Ventas: SOUP se convierte en el sistema central para registrar 
+todas las transacciones en el local, eliminando errores manuales y duplicidad de 
+trabajo. 
+● Inventario en Tiempo Real: Cada venta en el local actualiza automáticamente el 
+stock de productos e insumos, permitiendo una gestión precisa y evitando 
+quiebres de stock del Chipá. 
+● Control de Costos Detallado: La especialización en Chipá se beneficia 
+enormemente del cálculo de COGS y margen_ganancia_real por producto, 
+permitiendo a los dueños optimizar el precio y la rentabilidad de su producto 
+estrella. 
+● Reportes Financieros Instantáneos: Los dueños tienen acceso inmediato a 
+datos de ingresos y egresos, facilitando la toma de decisiones estratégicas sin 
+esperar a consolidar datos de Excel. 
+● Eficiencia Operativa: Simplifica el proceso de venta para el personal de 
+atención al cliente y mejora la planificación de producción para el cocinero. 
+● Escalabilidad Futura: Aunque la prioridad es el local, SOUP ya está preparado 
+para gestionar pedidos online y expandir el negocio cuando sea el momento 
+adecuado. 
