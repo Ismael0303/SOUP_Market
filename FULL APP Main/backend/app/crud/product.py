@@ -48,7 +48,7 @@ def _calculate_product_costs_and_prices(db: Session, db_product: Producto) -> No
     total_cogs = 0.0
     db.refresh(db_product, attribute_names=['insumos_asociados'])
     for producto_insumo in db_product.insumos_asociados:
-        insumo = db.query(Insumo).get(producto_insumo.insumo_id)
+        insumo = db.get(Insumo, producto_insumo.insumo_id)
         if insumo:
             total_cogs += producto_insumo.cantidad_necesaria * insumo.costo_unitario_compra
     db_product.cogs = total_cogs
