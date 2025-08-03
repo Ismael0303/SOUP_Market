@@ -84,7 +84,7 @@ def test_product_calculations():
         
         print("\n=== DETALLES DE INSUMOS ===")
         for producto_insumo in created_product.insumos_asociados:
-            insumo = db.query(Insumo).get(producto_insumo.insumo_id)
+            insumo = db.get(Insumo, producto_insumo.insumo_id)
             costo_insumo = producto_insumo.cantidad_necesaria * insumo.costo_unitario_compra
             print(f"- {insumo.nombre}: {producto_insumo.cantidad_necesaria} {insumo.unidad_medida_compra} x ${insumo.costo_unitario_compra} = ${costo_insumo}")
         
