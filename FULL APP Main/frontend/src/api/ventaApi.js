@@ -77,6 +77,124 @@ export const createVenta = async (ventaData) => {
   }
 };
 
+// ------- Endpoints de carrito de compras -------
+
+export const createCarrito = async (carritoData) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/ventas/carrito/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(carritoData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al crear carrito');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Error al crear carrito', 'error');
+    throw error;
+  }
+};
+
+export const getCarrito = async (carritoId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/ventas/carrito/${carritoId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al obtener carrito');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Error al obtener carrito', 'error');
+    throw error;
+  }
+};
+
+export const addItemToCarrito = async (carritoId, itemData) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/ventas/carrito/${carritoId}/items/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(itemData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al agregar item al carrito');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Error al agregar item al carrito', 'error');
+    throw error;
+  }
+};
+
+export const removeItemFromCarrito = async (carritoId, itemId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/ventas/carrito/${carritoId}/items/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al eliminar item del carrito');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Error al eliminar item del carrito', 'error');
+    throw error;
+  }
+};
+
+export const clearCarrito = async (carritoId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/ventas/carrito/${carritoId}/limpiar`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al limpiar carrito');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('Error al limpiar carrito', 'error');
+    throw error;
+  }
+};
+
 /**
  * Obtiene estadísticas del dashboard
  * @returns {Promise<Object>} Estadísticas
@@ -198,8 +316,13 @@ export const getProductosPorVencer = async () => {
 export default {
   getVentasByNegocio,
   createVenta,
+  createCarrito,
+  getCarrito,
+  addItemToCarrito,
+  removeItemFromCarrito,
+  clearCarrito,
   getDashboardStats,
   getAnalisisVentas,
   getAlertasStock,
   getProductosPorVencer
-}; 
+};

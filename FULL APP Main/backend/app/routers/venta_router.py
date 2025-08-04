@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 from typing import List, Optional
 from uuid import UUID
 from datetime import date, datetime, timedelta
