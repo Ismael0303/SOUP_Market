@@ -77,53 +77,26 @@ export const createVenta = async (ventaData) => {
   }
 };
 
-/**
- * Obtiene estadísticas del dashboard
- * @returns {Promise<Object>} Estadísticas
- */
-export const getDashboardStats = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/ventas/dashboard-stats`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al obtener estadísticas');
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error:', error);
-    return {
-      totalVentas: 0,
-      ventasHoy: 0,
-      ventasSemana: 0,
-      ventasMes: 0,
-      promedioVenta: 0
-    };
-  }
-};
 
 /**
  * Obtiene análisis de ventas por período
+ * @param {string} negocioId - ID del negocio
  * @param {string} startDate - Fecha de inicio (YYYY-MM-DD)
  * @param {string} endDate - Fecha de fin (YYYY-MM-DD)
  * @returns {Promise<Object>} Análisis de ventas
  */
-export const getAnalisisVentas = async (startDate, endDate) => {
+export const getAnalisisVentas = async (negocioId, startDate, endDate) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/ventas/analisis?start_date=${startDate}&end_date=${endDate}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `${API_BASE_URL}/ventas/analisis/${negocioId}?fecha_inicio=${startDate}&fecha_fin=${endDate}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     if (!response.ok) {
       throw new Error('Error al obtener análisis');
@@ -145,12 +118,13 @@ export const getAnalisisVentas = async (startDate, endDate) => {
 
 /**
  * Obtiene alertas de stock bajo
- * @returns {Promise<Array>} Lista de productos con stock bajo
+ * @param {string} negocioId - ID del negocio
+ * @returns {Promise<Object>} Lista de productos con stock bajo y total
  */
-export const getAlertasStock = async () => {
+export const getAlertasStock = async (negocioId) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/productos/alertas-stock`, {
+    const response = await fetch(`${API_BASE_URL}/ventas/alertas/stock/${negocioId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -165,23 +139,28 @@ export const getAlertasStock = async () => {
     return data;
   } catch (error) {
     console.error('Error:', error);
-    return [];
+    return { alertas: [], total: 0 };
   }
 };
 
 /**
- * Obtiene productos por vencer
- * @returns {Promise<Array>} Lista de productos por vencer
+ * Obtiene productos próximos a vencer
+ * @param {string} negocioId - ID del negocio
+ * @param {number} diasLimite - Días límite para alerta de vencimiento (opcional)
+ * @returns {Promise<Object>} Lista de productos por vencer y total
  */
-export const getProductosPorVencer = async () => {
+export const getProductosPorVencer = async (negocioId, diasLimite = 7) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_BASE_URL}/productos/por-vencer`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `${API_BASE_URL}/ventas/alertas/vencimiento/${negocioId}?dias_limite=${diasLimite}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     if (!response.ok) {
       throw new Error('Error al obtener productos por vencer');
@@ -191,15 +170,14 @@ export const getProductosPorVencer = async () => {
     return data;
   } catch (error) {
     console.error('Error:', error);
-    return [];
+    return { productos: [], total: 0 };
   }
 };
 
 export default {
   getVentasByNegocio,
   createVenta,
-  getDashboardStats,
   getAnalisisVentas,
   getAlertasStock,
   getProductosPorVencer
-}; 
+};
