@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getPublicBusinesses, getPublicProducts } from '../api/publicApi';
 
 const PublicListingScreen = () => {
   const [businesses, setBusinesses] = useState([]);
@@ -15,76 +16,24 @@ const PublicListingScreen = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadMockData = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
-        
-        // Datos simulados para demostración
-        const mockBusinesses = [
-          {
-            id: 1,
-            nombre: 'Panadería Ñiam',
-            tipo_negocio: 'panaderia',
-            descripcion: 'Los mejores panes artesanales de la ciudad',
-            rating: 4.8,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Panaderia']
-          },
-          {
-            id: 2,
-            nombre: 'Restaurante El Buen Sabor',
-            tipo_negocio: 'restaurante',
-            descripcion: 'Comida casera y tradicional',
-            rating: 4.5,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Restaurante']
-          },
-          {
-            id: 3,
-            nombre: 'Servicios Técnicos Rápidos',
-            tipo_negocio: 'servicios',
-            descripcion: 'Reparación y mantenimiento de equipos',
-            rating: 4.7,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Servicios']
-          }
-        ];
-
-        const mockProducts = [
-          {
-            id: 1,
-            nombre: 'Pan Francés',
-            descripcion: 'Pan artesanal recién horneado',
-            precio_venta: 25.00,
-            categoria: 'panaderia',
-            negocio_id: 1
-          },
-          {
-            id: 2,
-            nombre: 'Croissant',
-            descripcion: 'Croissant de mantequilla',
-            precio_venta: 100.00,
-            categoria: 'panaderia',
-            negocio_id: 1
-          },
-          {
-            id: 3,
-            nombre: 'Pizza Margherita',
-            descripcion: 'Pizza tradicional italiana',
-            precio_venta: 800.00,
-            categoria: 'restaurante',
-            negocio_id: 2
-          }
-        ];
-
-        setBusinesses(mockBusinesses);
-        setProducts(mockProducts);
+        const [businessesData, productsData] = await Promise.all([
+          getPublicBusinesses(),
+          getPublicProducts(),
+        ]);
+        setBusinesses(businessesData);
+        setProducts(productsData);
       } catch (err) {
         console.error('Error al cargar datos:', err);
-        setError('No se pudieron cargar los datos. Inténtalo de nuevo más tarde.');
+        setError(err.message || 'No se pudieron cargar los datos. Inténtalo de nuevo más tarde.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadMockData();
+    loadData();
   }, []);
 
   if (isLoading) {
