@@ -1,146 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getPublicBusinessById, getPublicProducts } from '../api/publicApi';
 
 const BusinessLandingScreen = () => {
   const { businessId } = useParams();
   const [business, setBusiness] = useState(null);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loadMockData = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
-        
-        // Datos simulados para demostración
-        const mockBusinesses = {
-          1: {
-            id: 1,
-            nombre: 'Panadería Ñiam',
-            tipo_negocio: 'panaderia',
-            descripcion: 'Los mejores panes artesanales de la ciudad. Especialistas en panes artesanales, facturas y pastelería tradicional.',
-            rating: 4.8,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Panaderia'],
-            direccion: 'Av. Principal 123, Centro',
-            telefono: '+54 11 1234-5678',
-            horarios: 'Lunes a Sábado 7:00 - 20:00'
-          },
-          2: {
-            id: 2,
-            nombre: 'Restaurante El Buen Sabor',
-            tipo_negocio: 'restaurante',
-            descripcion: 'Comida casera y tradicional. Los mejores platos de la cocina argentina con ingredientes frescos y de calidad.',
-            rating: 4.5,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Restaurante'],
-            direccion: 'Calle Comercial 456, Barrio Norte',
-            telefono: '+54 11 2345-6789',
-            horarios: 'Martes a Domingo 12:00 - 23:00'
-          },
-          3: {
-            id: 3,
-            nombre: 'Servicios Técnicos Rápidos',
-            tipo_negocio: 'servicios',
-            descripcion: 'Reparación y mantenimiento de equipos informáticos. Servicio técnico especializado en computadoras y notebooks.',
-            rating: 4.7,
-            fotos_urls: ['https://via.placeholder.com/400x300?text=Servicios'],
-            direccion: 'Zona Industrial 789, Sector Sur',
-            telefono: '+54 11 3456-7890',
-            horarios: 'Lunes a Viernes 9:00 - 18:00'
-          }
-        };
+        setError(null);
 
-        const mockProducts = {
-          1: [
-            {
-              id: 1,
-              nombre: 'Pan Francés',
-              descripcion: 'Pan artesanal recién horneado',
-              precio_venta: 25.00,
-              categoria: 'panaderia',
-              stock_terminado: 50
-            },
-            {
-              id: 2,
-              nombre: 'Croissant',
-              descripcion: 'Croissant de mantequilla',
-              precio_venta: 100.00,
-              categoria: 'panaderia',
-              stock_terminado: 30
-            },
-            {
-              id: 3,
-              nombre: 'Facturas',
-              descripcion: 'Facturas dulces variadas',
-              precio_venta: 80.00,
-              categoria: 'panaderia',
-              stock_terminado: 25
-            }
-          ],
-          2: [
-            {
-              id: 4,
-              nombre: 'Pizza Margherita',
-              descripcion: 'Pizza tradicional italiana',
-              precio_venta: 800.00,
-              categoria: 'restaurante',
-              stock_terminado: 20
-            },
-            {
-              id: 5,
-              nombre: 'Milanesa con Papas',
-              descripcion: 'Milanesa de ternera con papas fritas',
-              precio_venta: 1200.00,
-              categoria: 'restaurante',
-              stock_terminado: 15
-            },
-            {
-              id: 6,
-              nombre: 'Ensalada César',
-              descripcion: 'Ensalada fresca con aderezo especial',
-              precio_venta: 600.00,
-              categoria: 'restaurante',
-              stock_terminado: 10
-            }
-          ],
-          3: [
-            {
-              id: 7,
-              nombre: 'Mantenimiento PC',
-              descripcion: 'Servicio de mantenimiento preventivo',
-              precio_venta: 1500.00,
-              categoria: 'servicios',
-              stock_terminado: 999
-            },
-            {
-              id: 8,
-              nombre: 'Reparación Notebook',
-              descripcion: 'Diagnóstico y reparación de notebooks',
-              precio_venta: 2500.00,
-              categoria: 'servicios',
-              stock_terminado: 999
-            }
-          ]
-        };
+        const businessData = await getPublicBusinessById(businessId);
+        const allProducts = await getPublicProducts();
+        const productsData = allProducts.filter(
+          (product) => String(product.negocio_id) === String(businessId)
+        );
 
-        const businessData = mockBusinesses[businessId];
-        const productsData = mockProducts[businessId] || [];
-
-        if (businessData) {
-          setBusiness(businessData);
-          setProducts(productsData);
-        } else {
-          setBusiness(null);
-          setProducts([]);
-        }
+        setBusiness(businessData);
+        setProducts(productsData);
       } catch (err) {
         console.error('Error al cargar datos del negocio:', err);
+        setError('No se pudieron cargar los datos del negocio. Inténtalo de nuevo más tarde.');
+        setBusiness(null);
+        setProducts([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadMockData();
+    loadData();
   }, [businessId]);
 
   if (isLoading) {
@@ -149,6 +43,22 @@ const BusinessLandingScreen = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando negocio...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Volver al Marketplace
+          </button>
         </div>
       </div>
     );
@@ -267,4 +177,4 @@ const BusinessLandingScreen = () => {
   );
 };
 
-export default BusinessLandingScreen; 
+export default BusinessLandingScreen;
