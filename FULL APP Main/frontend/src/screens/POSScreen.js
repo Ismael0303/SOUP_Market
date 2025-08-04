@@ -1,9 +1,9 @@
 // TODO: Integrar <Breadcrumbs /> y usar notificaciones globales en acciones clave.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getProductsWithStock, updateProductStock } from '../api/productApi';
+import { getProductsWithStock } from '../api/productApi';
 import { getMyBusinesses } from '../api/businessApi';
-import { createVenta } from '../api/ventaApi';
+import { createVenta, createCarrito, addItemToCarrito, removeItemFromCarrito, getCarrito, clearCarrito } from '../api/ventaApi';
 import Layout from '../components/Layout';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useNotification } from '../context/NotificationContext';
@@ -13,6 +13,7 @@ const POSScreen = () => {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [cart, setCart] = useState([]);
+  const [carritoId, setCarritoId] = useState(null);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [clock, setClock] = useState(new Date());
@@ -23,6 +24,28 @@ const POSScreen = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Efectivo');
   const { showNotification } = useNotification();
   const { user } = useAuth();
+
+  const transformCartItems = (items, productsList = products) =>
+    items.map(item => {
+      const product = productsList.find(p => p.id === item.producto_id) || {};
+      return {
+        id: item.producto_id,
+        itemId: item.id,
+        nombre: product.nombre,
+        precio: item.precio_unitario,
+        qty: item.cantidad,
+        stock_terminado: product.stock_terminado || 0
+      };
+    });
+
+  const fetchCart = async (id) => {
+    try {
+      const carrito = await getCarrito(id);
+      setCart(transformCartItems(carrito.items));
+    } catch (err) {
+      console.error('Error al obtener carrito:', err);
+    }
+  };
 
   useEffect(() => {
     // Reloj en tiempo real
@@ -42,7 +65,7 @@ const POSScreen = () => {
         
         if (userBusinesses.length > 0) {
           setSelectedBusiness(userBusinesses[0]);
-          
+
           // Cargar productos con stock
           const productsWithStock = await getProductsWithStock();
           setProducts(productsWithStock);
@@ -75,6 +98,23 @@ const POSScreen = () => {
     loadPOSData();
   }, []);
 
+  useEffect(() => {
+    const initCarrito = async () => {
+      if (selectedBusiness) {
+        try {
+          const nuevoCarrito = await createCarrito({ negocio_id: selectedBusiness.id });
+          setCarritoId(nuevoCarrito.id);
+          setCart(transformCartItems(nuevoCarrito.items));
+        } catch (err) {
+          console.error('Error al crear carrito:', err);
+          showNotification('Error al iniciar carrito', 'error');
+        }
+      }
+    };
+
+    initCarrito();
+  }, [selectedBusiness]);
+
   const filteredProducts = products.filter(p =>
     (selectedCategory === 'all' || p.categoria === selectedCategory) &&
     (p.nombre.toLowerCase().includes(search.toLowerCase()) || 
@@ -82,30 +122,23 @@ const POSScreen = () => {
     p.stock_terminado > 0
   );
 
-  const addToCart = (product) => {
-    setCart(prev => {
-      const found = prev.find(item => item.id === product.id);
-      if (found) {
-        return prev.map(item => 
-          item.id === product.id 
-            ? { ...item, qty: item.qty + 1 } 
-            : item
-        );
-      }
-      return [...prev, { ...product, qty: 1 }];
-    });
+  const addToCart = async (product) => {
+    if (!carritoId) return;
+    await addItemToCarrito(carritoId, { producto_id: product.id, cantidad: 1 });
+    await fetchCart(carritoId);
   };
 
-  const removeFromCart = (id) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+  const removeFromCart = async (item) => {
+    if (!carritoId) return;
+    await removeItemFromCarrito(carritoId, item.itemId);
+    await fetchCart(carritoId);
   };
 
-  const updateQty = (id, qty) => {
-    setCart(prev => prev.map(item => 
-      item.id === id 
-        ? { ...item, qty: Math.max(1, qty) } 
-        : item
-    ));
+  const updateQty = async (item, qty) => {
+    if (!carritoId) return;
+    await removeItemFromCarrito(carritoId, item.itemId);
+    await addItemToCarrito(carritoId, { producto_id: item.id, cantidad: qty });
+    await fetchCart(carritoId);
   };
 
   const finalizarVenta = async () => {
@@ -125,55 +158,30 @@ const POSScreen = () => {
     }
 
     try {
-      const userId = user.id;
-      const businessId = selectedBusiness.id;
-
-      // Calcular totales
       const subtotal = cart.reduce((sum, item) => sum + (item.precio || 0) * item.qty, 0);
-      const taxAmount = subtotal * 0.21; // 21% IVA
-      const totalAmount = subtotal + taxAmount;
+      const impuestos = subtotal * 0.21;
+      const total = subtotal + impuestos;
 
-      // Crear objeto de venta para enviar al backend
-      const saleData = {
-        userId: userId,
-        businessId: businessId,
-        receiptNumber: `REC-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        saleDate: new Date().toISOString(), // Usar fecha actual
-        paymentMethod: selectedPaymentMethod,
-        totalAmount: totalAmount,
-        subtotalAmount: subtotal,
-        taxAmount: taxAmount,
-        currency: "ARS",
-        status: "Completada",
-        customerInfo: {}, // Se podría añadir un modal para capturar esto
-        items: cart.map(item => ({
-          productId: item.id,
-          productName: item.nombre,
-          quantity: item.qty,
-          unitPrice: item.precio,
-          itemTotal: item.precio * item.qty,
-          sku: item.sku || '',
-          categoria: item.categoria || ''
+      const ventaData = {
+        negocio_id: selectedBusiness.id,
+        cliente_id: user.id,
+        subtotal,
+        impuestos,
+        total,
+        metodo_pago: selectedPaymentMethod,
+        detalles: cart.map(item => ({
+          producto_id: item.id,
+          cantidad: item.qty,
+          precio_unitario: item.precio,
+          descuento_unitario: 0,
         })),
-        notes: "",
-        discountAmount: 0,
-        discountReason: ""
       };
 
-      // Guardar venta en el backend
-      const newSale = await createVenta(saleData);
-
-      // Actualizar stock de productos vendidos
-      for (const item of cart) {
-        const newStock = item.stock_terminado - item.qty;
-        await updateProductStock(item.id, newStock);
-      }
-
-      // Limpiar carrito
+      await createVenta(ventaData);
+      await clearCarrito(carritoId);
       setCart([]);
       showNotification('Venta finalizada exitosamente y registrada.', 'success');
-      
-      // Recargar productos para actualizar stock
+
       const updatedProducts = await getProductsWithStock();
       setProducts(updatedProducts);
     } catch (error) {
@@ -181,6 +189,7 @@ const POSScreen = () => {
       showNotification('Error al finalizar la venta. Inténtalo de nuevo.', 'error');
     }
   };
+
 
   const total = cart.reduce((sum, item) => sum + (item.precio || 0) * item.qty, 0);
 
@@ -370,7 +379,7 @@ const POSScreen = () => {
                     </tr>
                   ) : (
                     cart.map(item => (
-                      <tr key={item.id} className="border-b">
+                      <tr key={item.itemId} className="border-b">
                         <td className="py-2 px-2 font-semibold">{item.nombre}</td>
                         <td className="py-2 px-2">${(item.precio || 0).toFixed(2)}</td>
                         <td className="py-2 px-2">
@@ -379,7 +388,7 @@ const POSScreen = () => {
                             min={1} 
                             max={item.stock_terminado}
                             value={item.qty} 
-                            onChange={e => updateQty(item.id, parseInt(e.target.value))} 
+                            onChange={e => updateQty(item, parseInt(e.target.value))}
                             className="w-16 border rounded px-2 py-1" 
                           />
                         </td>
@@ -388,7 +397,7 @@ const POSScreen = () => {
                         </td>
                         <td className="py-2 px-2">
                           <button 
-                            onClick={() => removeFromCart(item.id)} 
+                            onClick={() => removeFromCart(item)}
                             className="text-red-500 hover:underline"
                           >
                             Eliminar
