@@ -55,3 +55,5 @@ def test_register():
 
 if __name__ == "__main__":
     test_register() 
+
+input("Press Enter to exit...")

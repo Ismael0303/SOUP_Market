@@ -118,3 +118,5 @@ def test_product_calculations():
 
 if __name__ == "__main__":
     test_product_calculations() 
+
+input("Press Enter to exit...")

@@ -1,0 +1,28 @@
+version: "3"
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: shuup
+      POSTGRES_USER: shuup
+      POSTGRES_PASSWORD: shuup
+    ports:
+      - "5433:5432"
+    volumes:
+      - shuup-db:/var/lib/postgresql/data
+
+  shuup:
+    image: shuup/enterprise-demo
+    depends_on:
+      - db
+    environment:
+      SHUUP_DATABASE_URL: postgres://shuup:shuup@db:5432/shuup
+    ports:
+      - "9999:9000"
+    volumes:
+      - shuup-media:/app/media
+
+volumes:
+  shuup-db:
+  shuup-media:

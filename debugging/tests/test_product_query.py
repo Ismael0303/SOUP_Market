@@ -69,3 +69,5 @@ def test_product_query():
 
 if __name__ == "__main__":
     test_product_query() 
+
+input("Press Enter to exit...")
