@@ -155,7 +155,7 @@ class Producto(Base):
     reviews_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     # NUEVOS CAMPOS ESPECÍFICOS PARA PANADERÍA
-    categoria: Mapped[Optional[ProductCategory]] = mapped_column(Enum(ProductCategory), nullable=True)
+    categoria: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     codigo_lote: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # Código de lote para trazabilidad
     fecha_vencimiento: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)  # Fecha de vencimiento
     fecha_produccion: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)  # Fecha de producción
