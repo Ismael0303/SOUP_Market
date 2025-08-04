@@ -10,6 +10,7 @@ from app.routers import public_ai_router
 from app.routers import plugin_router # Import the new plugin router
 from app.routers import venta_router # Import the new venta router
 from app.routers import niam_router # Import the new niam router
+from app.routers import review_router
 
 # Create the FastAPI application instance
 app = FastAPI(
@@ -99,3 +100,4 @@ app.include_router(public_ai_router.router, tags=["AI Recomendaciones"])
 app.include_router(plugin_router.router, tags=["Plugins"])
 app.include_router(venta_router.router, tags=["Ventas & POS"])
 app.include_router(niam_router.router, tags=["Panadería Ñiam"])
+app.include_router(review_router.router, prefix="/reviews", tags=["Reviews"])

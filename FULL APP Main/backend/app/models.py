@@ -88,6 +88,7 @@ class Usuario(Base):
     )
     productos: Mapped[List["Producto"]] = relationship("Producto", back_populates="propietario", cascade="all, delete-orphan")
     insumos: Mapped[List["Insumo"]] = relationship("Insumo", back_populates="usuario", cascade="all, delete-orphan")
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="usuario", cascade="all, delete-orphan")
     negocio_asignado: Mapped[Optional["Negocio"]] = relationship(
         "Negocio",
         foreign_keys=[negocio_asignado_id]
@@ -175,6 +176,7 @@ class Producto(Base):
     propietario: Mapped["Usuario"] = relationship("Usuario", back_populates="productos")
     negocio: Mapped["Negocio"] = relationship("Negocio", back_populates="productos")
     insumos_asociados: Mapped[List["ProductoInsumo"]] = relationship("ProductoInsumo", back_populates="producto", cascade="all, delete-orphan")
+    reviews: Mapped[List["Review"]] = relationship("Review", back_populates="producto", cascade="all, delete-orphan")
 
 
 class Insumo(Base):
@@ -206,6 +208,20 @@ class ProductoInsumo(Base):
     # Relaciones
     producto: Mapped["Producto"] = relationship("Producto", back_populates="insumos_asociados")
     insumo: Mapped["Insumo"] = relationship("Insumo", back_populates="productos_asociados")
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4, unique=True, nullable=False)
+    usuario_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
+    producto_id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("productos.id"), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comentario: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    fecha_creacion: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="reviews")
+    producto: Mapped["Producto"] = relationship("Producto", back_populates="reviews")
 
 
 class Publicidad(Base):
