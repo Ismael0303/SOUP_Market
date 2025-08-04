@@ -39,5 +39,8 @@ Thumbs.db
 *.bak
 *.tmp
 
+# Shuup
+/Integraciones OpenSource/shuup/shuup/
+
 # Archivos problemáticos por longitud de ruta
 Documentación/Roadmap/Actualizaciones a implementar/ROADMAP - Protocolo de Actualizaciones y Plugins & Plugins 'Actualización Panadería', 'Actualización Discográfica' & Módulo 'Amigos del Negocio'.txt 
