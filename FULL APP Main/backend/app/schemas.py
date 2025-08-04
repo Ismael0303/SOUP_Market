@@ -137,8 +137,8 @@ class ProductoResponse(ProductoBase):
     fecha_creacion: datetime
     fecha_actualizacion: datetime
     insumos_asociados: List["ProductoInsumoResponse"] = []
-    calificacion_promedio: Optional[float] = Field(None, description="Calificación promedio del producto.")
-    ventas_completadas: Optional[int] = Field(None, description="Número de ventas/transacciones completadas.")
+    rating_promedio: float = Field(0, description="Calificación promedio del producto.")
+    reviews_count: int = Field(0, description="Número de reseñas del producto.")
     model_config = ConfigDict(from_attributes=True)
 
 # Schemas para Insumo
@@ -180,6 +180,25 @@ class ProductoInsumoResponse(ProductoInsumoBase):
     producto_id: UUID
     fecha_asociacion: datetime
     insumo: InsumoResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Schemas para Review
+class ReviewBase(BaseModel):
+    producto_id: UUID
+    rating: int = Field(..., ge=1, le=5)
+    comentario: Optional[str] = None
+
+
+class ReviewCreate(ReviewBase):
+    pass
+
+
+class ReviewResponse(ReviewBase):
+    id: UUID
+    usuario_id: UUID
+    fecha_creacion: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -267,6 +286,7 @@ ProductoCreate.model_rebuild()
 ProductoUpdate.model_rebuild()
 ProductoResponse.model_rebuild()
 ProductoInsumoResponse.model_rebuild()
+ReviewResponse.model_rebuild()
 
 # NUEVOS SCHEMAS PARA PRODUCTOS MEJORADOS
 class ProductoPanaderiaBase(BaseModel):
