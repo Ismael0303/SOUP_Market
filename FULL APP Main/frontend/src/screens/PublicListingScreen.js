@@ -201,16 +201,18 @@ const PublicListingScreen = () => {
                     <div key={business.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300">
                       <div className="relative">
                         <img
-                          src={business.fotos_urls[0]}
+                          src={business.fotos_urls?.[0] || 'https://via.placeholder.com/400x300?text=Negocio'}
                           alt={business.nombre}
                           className="w-full h-48 object-cover"
                           onError={(e) => {
                             e.target.src = 'https://via.placeholder.com/400x300?text=Negocio';
                           }}
                         />
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-sm font-semibold">
-                          ⭐ {business.rating}
-                        </div>
+                        {business.rating && (
+                          <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-sm font-semibold">
+                            ⭐ {business.rating}
+                          </div>
+                        )}
                       </div>
                       <div className="p-6">
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{business.nombre}</h3>

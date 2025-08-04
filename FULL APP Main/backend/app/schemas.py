@@ -1,6 +1,6 @@
 # backend/app/schemas.py
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, AliasChoices
 from typing import Optional, List, Dict, Any
 from datetime import datetime, date
 from uuid import UUID
@@ -95,7 +95,11 @@ class NegocioResponse(NegocioBase):
     propietario_id: UUID
     fecha_creacion: datetime
     fecha_actualizacion: datetime
-    calificacion_promedio: Optional[float] = Field(None, description="Calificación promedio del negocio.")
+    rating: Optional[float] = Field(
+        None,
+        validation_alias=AliasChoices('calificacion_promedio', 'rating'),
+        description="Calificación promedio del negocio."
+    )
     ventas_completadas: Optional[int] = Field(None, description="Número de ventas/transacciones completadas.")
     model_config = ConfigDict(from_attributes=True)
 
@@ -108,6 +112,7 @@ class ProductoBase(BaseModel):
     negocio_id: UUID
     precio_venta: Optional[float] = Field(None, ge=0, description="Precio de venta final del producto/servicio")
     margen_ganancia_sugerido: Optional[float] = Field(None, ge=0, description="Margen de ganancia sugerido en porcentaje (ej. 20 para 20%)")
+    categoria: Optional[str] = None
 
 class ProductoCreate(ProductoBase):
     insumos: Optional[List["ProductoInsumoCreate"]] = None
@@ -123,6 +128,7 @@ class ProductoUpdate(BaseModel):
     precio_venta: Optional[float] = Field(None, ge=0)
     margen_ganancia_sugerido: Optional[float] = Field(None, ge=0)
     insumos: Optional[List["ProductoInsumoCreate"]] = None
+    categoria: Optional[str] = None
 
 class ProductoResponse(ProductoBase):
     id: UUID
