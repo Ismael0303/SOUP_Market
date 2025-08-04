@@ -3,18 +3,16 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useNotification } from '../context/NotificationContext';
+import { createProduct } from '../api/productApi';
 
 const CreateProductScreen = () => {
   const [form, setForm] = useState({
     nombre: '',
-    sku: '',
+    descripcion: '',
+    precio: '',
     precio_venta: '',
-    costo: '',
-    stock: '',
-    categoria: '',
-    proveedor: '',
-    notas: '',
-    activo: true,
+    tipo_producto: '',
+    negocio_id: '',
   });
   const [errors, setErrors] = useState({});
   const [image, setImage] = useState(null);
@@ -25,9 +23,10 @@ const CreateProductScreen = () => {
   const validate = () => {
     const newErrors = {};
     if (!form.nombre) newErrors.nombre = 'El nombre es obligatorio';
-    if (!form.precio_venta) newErrors.precio_venta = 'El precio es obligatorio';
-    if (!form.costo) newErrors.costo = 'El costo es obligatorio';
-    if (!form.stock) newErrors.stock = 'El stock es obligatorio';
+    if (!form.precio) newErrors.precio = 'El precio base es obligatorio';
+    if (!form.precio_venta) newErrors.precio_venta = 'El precio de venta es obligatorio';
+    if (!form.tipo_producto) newErrors.tipo_producto = 'El tipo de producto es obligatorio';
+    if (!form.negocio_id) newErrors.negocio_id = 'El ID del negocio es obligatorio';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -52,14 +51,29 @@ const CreateProductScreen = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
       showNotification('Por favor corrige los errores del formulario.', 'error');
       return;
     }
-    // Aquí iría la lógica de envío al backend
-    showNotification('Producto creado correctamente', 'success');
+
+    const productData = {
+      nombre: form.nombre,
+      descripcion: form.descripcion || undefined,
+      precio: parseFloat(form.precio),
+      tipo_producto: form.tipo_producto,
+      negocio_id: form.negocio_id,
+      precio_venta: parseFloat(form.precio_venta),
+    };
+
+    try {
+      await createProduct(productData);
+      showNotification('Producto creado correctamente', 'success');
+    } catch (err) {
+      console.error('Error al crear producto:', err);
+      showNotification(err.message || 'Error al crear el producto.', 'error');
+    }
   };
 
   return (
@@ -95,8 +109,9 @@ const CreateProductScreen = () => {
                 {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-                <input type="text" name="sku" value={form.sku} onChange={handleChange} className="input-field" placeholder="Código único del producto" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Precio Base (ARS) <span className="text-red-500">*</span></label>
+                <input type="number" name="precio" value={form.precio} onChange={handleChange} className={`input-field ${errors.precio ? 'border-red-500' : ''}`} placeholder="Ej: 15000" />
+                {errors.precio && <p className="text-xs text-red-500 mt-1">{errors.precio}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Precio de Venta (ARS) <span className="text-red-500">*</span></label>
@@ -104,27 +119,25 @@ const CreateProductScreen = () => {
                 {errors.precio_venta && <p className="text-xs text-red-500 mt-1">{errors.precio_venta}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Costo de Compra (ARS) <span className="text-red-500">*</span></label>
-                <input type="number" name="costo" value={form.costo} onChange={handleChange} className={`input-field ${errors.costo ? 'border-red-500' : ''}`} placeholder="Ej: 15000" />
-                {errors.costo && <p className="text-xs text-red-500 mt-1">{errors.costo}</p>}
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Producto <span className="text-red-500">*</span></label>
+                <select name="tipo_producto" value={form.tipo_producto} onChange={handleChange} className={`input-field ${errors.tipo_producto ? 'border-red-500' : ''}`}>
+                  <option value="">Selecciona una opción</option>
+                  <option value="PHYSICAL_GOOD">Bien físico</option>
+                  <option value="SERVICE_BY_HOUR">Servicio por hora</option>
+                  <option value="SERVICE_BY_PROJECT">Servicio por proyecto</option>
+                  <option value="DIGITAL_GOOD">Bien digital</option>
+                </select>
+                {errors.tipo_producto && <p className="text-xs text-red-500 mt-1">{errors.tipo_producto}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Actual <span className="text-red-500">*</span></label>
-                <input type="number" name="stock" value={form.stock} onChange={handleChange} className={`input-field ${errors.stock ? 'border-red-500' : ''}`} placeholder="Cantidad disponible" />
-                {errors.stock && <p className="text-xs text-red-500 mt-1">{errors.stock}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-                <input type="text" name="categoria" value={form.categoria} onChange={handleChange} className="input-field" placeholder="Ej: Panadería, Bebidas" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Proveedor</label>
-                <input type="text" name="proveedor" value={form.proveedor} onChange={handleChange} className="input-field" placeholder="Nombre del proveedor" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">ID del Negocio <span className="text-red-500">*</span></label>
+                <input type="text" name="negocio_id" value={form.negocio_id} onChange={handleChange} className={`input-field ${errors.negocio_id ? 'border-red-500' : ''}`} placeholder="UUID del negocio" />
+                {errors.negocio_id && <p className="text-xs text-red-500 mt-1">{errors.negocio_id}</p>}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-              <textarea name="notas" value={form.notas} onChange={handleChange} rows={3} className="input-field resize-y" placeholder="Notas adicionales sobre el producto..." />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+              <textarea name="descripcion" value={form.descripcion} onChange={handleChange} rows={3} className="input-field resize-y" placeholder="Descripción del producto..." />
             </div>
             {/* Imagen */}
             <div>
@@ -137,11 +150,6 @@ const CreateProductScreen = () => {
               <div className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 text-center overflow-hidden">
                 {imagePreview ? <img src={imagePreview} alt="Previsualización" className="w-full h-full object-cover rounded-lg" /> : 'Previsualización de imagen'}
               </div>
-            </div>
-            {/* Checkbox activo */}
-            <div className="flex items-center">
-              <input type="checkbox" name="activo" checked={form.activo} onChange={handleChange} className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-              <label className="ml-2 block text-sm font-medium text-gray-700">Producto Activo</label>
             </div>
             {/* Botones de acción */}
             <div className="flex justify-end gap-4 mt-8">
